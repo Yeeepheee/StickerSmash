@@ -1,0 +1,89 @@
+package com.luminous5972.StickerSmash;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
+import android.content.Intent;
+import android.app.PendingIntent;
+import android.content.Context;
+import androidx.core.app.NotificationCompat;
+import androidx.annotation.Nullable;
+
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+public class LiveTimerModule extends ReactContextBaseJavaModule {
+
+    private static final String CHANNEL_ID = "timer_channel";
+    private static final int NOTIFICATION_ID = 1;
+
+    // 1. We need a static reference to the context to send events back to JS
+    private static ReactApplicationContext reactContext;
+
+    public LiveTimerModule(ReactApplicationContext context) {
+        super(context);
+        reactContext = context; // Store the context
+    }
+
+    @Override
+    public String getName() {
+        return "LiveTimer";
+    }
+
+    // 2. This is the "sendEvent" method that TimerReceiver was looking for
+    public static void sendEvent(String eventName) {
+        if (reactContext != null) {
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, null);
+        }
+    }
+
+    @ReactMethod
+    public void startLiveActivity(double startTime) {
+        ReactApplicationContext context = getReactApplicationContext();
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Create Channel (Required for Android 8+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID, "Timer Updates", NotificationManager.IMPORTANCE_HIGH
+            );
+            manager.createNotificationChannel(channel);
+        }
+
+        Intent stopIntent = new Intent(context, TimerReceiver.class);
+        stopIntent.setAction("STOP_ACTION");
+
+        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
+                context,
+                0,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(context.getApplicationInfo().icon)
+                .setContentTitle("Stopwatch Running")
+                .setOngoing(true)
+                .setUsesChronometer(true)
+                .setWhen((long) startTime)
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", stopPendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX) // Makes it stay at the top
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // Ensures it shows on Lock Screen
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0)); // Tells Android this is time-sensitive
+//                .setPriority(NotificationCompat.PRIORITY_LOW);
+
+        manager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    @ReactMethod
+    public void stopLiveActivity() {
+        NotificationManager manager = (NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(NOTIFICATION_ID);
+    }
+}
