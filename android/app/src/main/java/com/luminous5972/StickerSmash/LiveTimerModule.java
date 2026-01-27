@@ -15,6 +15,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
 
 public class LiveTimerModule extends ReactContextBaseJavaModule {
 
@@ -23,6 +27,11 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
 
     // 1. We need a static reference to the context to send events back to JS
     private static ReactApplicationContext reactContext;
+
+    private Handler updateHandler = new Handler(Looper.getMainLooper());
+    private Runnable updateRunnable;
+    private double endTime;
+    private double startTime;
 
     public LiveTimerModule(ReactApplicationContext context) {
         super(context);
@@ -44,36 +53,43 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void startLiveActivity(double endTime) { // endTime should be a timestamp in the future
+    public void startLiveActivity(double endTime) {
+
+        if (updateRunnable != null) {
+            updateHandler.removeCallbacks(updateRunnable);
+        }
+
+        if (this.endTime != endTime) {
+            this.startTime = System.currentTimeMillis();
+            this.endTime = endTime;
+            Log.d("LiveTimer", "New Timer Detected. Start: " + startTime + " End: " + endTime);
+        }
+
+        Log.d("MyTimerTag", "The current progress is: ");
+        // Create the runnable that will update the UI
+        updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateNotification();
+                updateHandler.postDelayed(this, 10);
+            }
+        };
+
+        // Start the loop
+        updateHandler.post(updateRunnable);
+    }
+
+    private void updateNotification() {
         ReactApplicationContext context = getReactApplicationContext();
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Create Channel (Required for Android 8+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID, "Timer Updates", NotificationManager.IMPORTANCE_HIGH
-            );
-            manager.createNotificationChannel(channel);
+        int progress = calculateProgress(startTime,endTime);
+
+        // Check if we are done
+        if (progress >= 100) {
+            stopLiveActivity();
+            return;
         }
-
-// --- FIX THESE LINES ---
-        Intent stopIntent = new Intent(context, TimerReceiver.class);
-        stopIntent.setAction("STOP_ACTION");
-
-        Intent resetIntent = new Intent(context, TimerReceiver.class);
-        resetIntent.setAction("RESET_ACTION"); // Previously you had stopIntent.setAction here!
-
-// You MUST create two distinct PendingIntents with different request codes (0 and 1)
-        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(
-                context, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-        PendingIntent resetPendingIntent = PendingIntent.getBroadcast(
-                context, 1, resetIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
-
-
-        int progress = calculateProgress(0, endTime);
 
         if (Build.VERSION.SDK_INT >= 36) {
             Notification.ProgressStyle progressStyle = new Notification.ProgressStyle()
@@ -114,23 +130,29 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void stopLiveActivity() {
+        // 1. Stop the loop to save battery!
+        if (updateHandler != null && updateRunnable != null) {
+            updateHandler.removeCallbacks(updateRunnable);
+        }
+
+        // 2. Clear the notification
         NotificationManager manager = (NotificationManager) getReactApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(NOTIFICATION_ID);
-
-
     }
-    private int calculateProgress(double startTime, double endTime) {
-        double currentTime = (double) System.currentTimeMillis();
 
-        if (currentTime >= endTime) return 100;
-        if (currentTime <= startTime) return 0;
+    private int calculateProgress(double start, double end) {
+        long now = System.currentTimeMillis();
 
-        double totalDuration = endTime - startTime;
-        double elapsed = currentTime - startTime;
+        if (end <= start) return 100;
+        if (now >= end) return 100;
+        if (now <= start) return 0;
 
-        // Convert to a 0-100 scale for the progress bar
-        double percentage = (elapsed / totalDuration) * 100;
+        double totalDuration = end - start;
+        double elapsed = now - start;
 
-        return (int) Math.round(percentage);
+        // Math: (Elapsed / Total) * 100
+        float percentage = (float) ((elapsed / totalDuration) * 100);
+
+        return Math.round(percentage);
     }
 }
