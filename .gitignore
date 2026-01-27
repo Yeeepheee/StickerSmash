@@ -50,8 +50,10 @@ android/build/
 android/app/*.apk
 android/app/*.aab
 
-# Keystore / secrets
-android/*.keystore
-android/*.jks
+# Keystore / secrets (The ** makes it recursive)
+**/android/*.keystore
+**/android/*.jks
+**/*.keystore
+**/*.jks
 android/key.properties
 android/local.properties
