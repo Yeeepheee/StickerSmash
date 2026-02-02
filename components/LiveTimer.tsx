@@ -1,5 +1,5 @@
 import { NativeModules, Platform, PermissionsAndroid } from 'react-native';
-
+import ActivityController from '@/modules/activity-controller';
 // 1. Define the interface so TS knows what arguments the Java methods take
 interface LiveTimerInterface {
   startLiveActivity(endTime: number): void; // Updated to accept 1 argument
@@ -28,12 +28,19 @@ export const startLiveActivity = async (endTime: number) => { // Accept startTim
     } else {
       console.error("LiveTimer module not found. Run 'npx expo run:android'");
     }
+  } 
+  else if (Platform.OS === 'ios') {
+    // Convert ms to seconds for Swift
+    ActivityController.startLiveActivity(endTime / 1000);
   }
 };
 
 export const stopLiveActivity = () => {
   if (Platform.OS === 'android' && LiveTimer) {
     LiveTimer.stopLiveActivity();
+  }
+  else if (Platform.OS === 'ios') {
+    ActivityController.stopLiveActivity();
   }
 };
 

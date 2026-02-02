@@ -9,18 +9,34 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "appleTeamId": "5X6DZFVDUW",
+      "infoPlist": {
+        "NSSupportsLiveActivities": true,
+        "NSSupportsLiveActivitiesFrequentUpdates": true
+      },
+      "bundleIdentifier": "com.luminous5972.StickerSmash",
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.luminous5972.StickerSmash"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        // "foregroundImage": "./assets/images/android-icon-foreground.png",
-        // "backgroundImage": "./assets/images/android-icon-background.png",
-        // "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#E6F4FE"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.luminous5972.StickerSmash"
+      "package": "com.luminous5972.StickerSmash",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES"
+      ]
     },
     "web": {
       "output": "static",
@@ -46,10 +62,14 @@
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
           "isAccessMediaLocationEnabled": true,
-          "granularPermissions": ["audio", "photo"]
+          "granularPermissions": [
+            "audio",
+            "photo"
+          ]
         }
       ],
-      "patch-project"
+      "patch-project",
+      "@bacons/apple-targets"
     ],
     "experiments": {
       "typedRoutes": true,

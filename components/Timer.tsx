@@ -35,9 +35,8 @@ export default function Timer() {
       const targetTime = Date.now() + (seconds * 1000);
       endTimeRef.current = targetTime;
 
-      if (Platform.OS === 'android') {
-        LiveTimer.startLiveActivity(targetTime);
-      }
+      LiveTimer.startLiveActivity(targetTime);
+      
 
       interval = setInterval(() => {
         if (endTimeRef.current) {
@@ -54,7 +53,7 @@ export default function Timer() {
 
           if (remaining <= 0) {
             setIsActive(false);
-            if (Platform.OS === 'android') LiveTimer.stopLiveActivity();
+            LiveTimer.stopLiveActivity();
             clearInterval(interval);
           }
         }
@@ -62,10 +61,7 @@ export default function Timer() {
     } else {
       if (interval) clearInterval(interval);
 
-      if (Platform.OS === 'android') {
-        LiveTimer.stopLiveActivity();
-      }
-
+      LiveTimer.stopLiveActivity();
       endTimeRef.current = null;
     }
 
