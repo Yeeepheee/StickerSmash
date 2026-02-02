@@ -1,5 +1,5 @@
 import { NativeModules, Platform, PermissionsAndroid } from 'react-native';
-import ActivityController from '@/modules/activity-controller';
+const { ActivityController } = NativeModules;
 // 1. Define the interface so TS knows what arguments the Java methods take
 interface LiveTimerInterface {
   startLiveActivity(endTime: number): void; // Updated to accept 1 argument

@@ -72,18 +72,18 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private PendingIntent createPendingIntent(String action) {
-        Intent intent = new Intent(getReactApplicationContext(), TimerReceiver.class);
-        intent.setAction(action);
-
-        // API 31+ requires FLAG_IMMUTABLE or FLAG_MUTABLE
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            flags |= PendingIntent.FLAG_IMMUTABLE;
-        }
-
-        return PendingIntent.getBroadcast(getReactApplicationContext(), action.hashCode(), intent, flags);
-    }
+//    private PendingIntent createPendingIntent(String action) {
+//        Intent intent = new Intent(getReactApplicationContext(), TimerReceiver.class);
+//        intent.setAction(action);
+//
+//        // API 31+ requires FLAG_IMMUTABLE or FLAG_MUTABLE
+//        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            flags |= PendingIntent.FLAG_IMMUTABLE;
+//        }
+//
+//        return PendingIntent.getBroadcast(getReactApplicationContext(), action.hashCode(), intent, flags);
+//    }
 
 
     @ReactMethod
