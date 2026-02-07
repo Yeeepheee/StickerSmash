@@ -34,3 +34,34 @@ struct TimerWidgetLiveActivity: Widget {
         }
     }
 }
+
+
+// Ensure you target iOS 17.0+ for the #Preview macro
+@available(iOS 17.0, *)
+#Preview("Lock Screen", as: .content, using: TimerAttributes(timerName: "Pizza Timer")) {
+    TimerWidgetLiveActivity()
+} contentStates: {
+    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 5)) // 5 mins remaining
+    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(10))      // 10 secs remaining
+}
+
+@available(iOS 17.0, *)
+#Preview("Dynamic Island Compact", as: .dynamicIsland(.compact), using: TimerAttributes(timerName: "Meeting")) {
+    TimerWidgetLiveActivity()
+} contentStates: {
+    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 15))
+}
+
+@available(iOS 17.0, *)
+#Preview("Dynamic Island Expanded", as: .dynamicIsland(.expanded), using: TimerAttributes(timerName: "Workout")) {
+    TimerWidgetLiveActivity()
+} contentStates: {
+    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 25))
+}
+
+@available(iOS 17.0, *)
+#Preview("Dynamic Island Minimal", as: .dynamicIsland(.minimal), using: TimerAttributes(timerName: "Egg Timer")) {
+    TimerWidgetLiveActivity()
+} contentStates: {
+    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60))
+}

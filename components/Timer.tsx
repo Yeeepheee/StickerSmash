@@ -1,66 +1,78 @@
 import { useEffect, useState, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { Text, View, StyleSheet, TouchableOpacity, Platform, DeviceEventEmitter } from 'react-native';
 import LiveTimer from '@/components/LiveTimer';
 
 export default function Timer() {
-  // 1. Initialize with your starting countdown time (e.g., 60 seconds)
   const [seconds, setSeconds] = useState(60);
   const [isActive, setIsActive] = useState(false);
-
-  // Use a ref to store the target end timestamp
   const endTimeRef = useRef<number | null>(null);
 
+  // --- ADDED: AppState listener to handle background re-entry ---
   useEffect(() => {
-    const stopSub = DeviceEventEmitter.addListener('onTimerStopped', () => {
-      setIsActive(false);
-    });
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active' && isActive && endTimeRef.current) {
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((endTimeRef.current - now) / 1000));
+        setSeconds(remaining);
+        
+        // If the timer finished while in the background
+        if (remaining <= 0) {
+          setIsActive(false);
+          LiveTimer.stopLiveActivity();
+        }
+      }
+    };
 
-    // ADD THIS:
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, [isActive]);
+
+  useEffect(() => {
+    const stopSub = DeviceEventEmitter.addListener('onTimerStopped', () => setIsActive(false));
     const resetSub = DeviceEventEmitter.addListener('onTimerReset', () => {
       setIsActive(false);
-      setSeconds(60); // Or your default starting time
+      setSeconds(60);
     });
-
-    return () => {
-      stopSub.remove();
-      resetSub.remove();
-    };
+    return () => { stopSub.remove(); resetSub.remove(); };
   }, []);
 
   useEffect(() => {
     let interval: any = null;
 
     if (isActive) {
-      // 2. Calculate the target end time (Now + remaining seconds)
-      const targetTime = Date.now() + (seconds * 1000);
-      endTimeRef.current = targetTime;
-
-      LiveTimer.startLiveActivity(targetTime);
-      
+      // If we are starting fresh (no end time yet)
+      if (!endTimeRef.current) {
+         endTimeRef.current = Date.now() + (seconds * 1000);
+         LiveTimer.startLiveActivity(endTimeRef.current);
+      }
 
       interval = setInterval(() => {
         if (endTimeRef.current) {
           const now = Date.now();
           const remaining = Math.max(0, Math.floor((endTimeRef.current - now) / 1000));
 
-          setSeconds(remaining); // Keep the app UI smooth (updates every 100ms)
+          setSeconds(remaining);
 
-          // ONLY update the Android Notification every 5 seconds
-          // This saves battery and prevents bridge congestion
           if (Platform.OS === 'android' && remaining % 5 === 0) {
             LiveTimer.startLiveActivity(endTimeRef.current);
           }
 
+          if (remaining === 10) {
+            LiveTimer.updateLiveActivity(endTimeRef.current, true);
+          }
+          
           if (remaining <= 0) {
             setIsActive(false);
             LiveTimer.stopLiveActivity();
+            endTimeRef.current = null; // Clear it so it can restart
             clearInterval(interval);
           }
         }
       }, 100);
     } else {
       if (interval) clearInterval(interval);
-
+      // Only stop if we were actually active (prevents double calls)
       LiveTimer.stopLiveActivity();
       endTimeRef.current = null;
     }
@@ -77,22 +89,15 @@ export default function Timer() {
   return (
     <View style={styles.container}>
       <View style={styles.centerBox}>
-        {/* 'seconds' is now correctly defined in the state above */}
         <Text style={styles.timerText}>{formatTime(seconds)}</Text>
-
         <TouchableOpacity
           style={[styles.button, isActive && { backgroundColor: '#EF4444' }]}
           onPress={() => setIsActive(!isActive)}
         >
           <Text style={styles.buttonText}>{isActive ? 'STOP' : 'START'}</Text>
         </TouchableOpacity>
-
-        {/* Optional Reset Button */}
         {!isActive && seconds !== 60 && (
-          <TouchableOpacity
-            style={{ marginTop: 20 }}
-            onPress={() => setSeconds(60)}
-          >
+          <TouchableOpacity style={{ marginTop: 20 }} onPress={() => setSeconds(60)}>
             <Text style={{ color: '#94A3B8' }}>Reset Timer</Text>
           </TouchableOpacity>
         )}
@@ -102,33 +107,15 @@ export default function Timer() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerBox: {
-    alignItems: 'center',
-  },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  centerBox: { alignItems: 'center' },
   timerText: {
     color: '#FFFFFF',
     fontSize: 80,
     fontWeight: '300',
-    fontFamily: Platform.select({
-      ios: 'Courier',
-      android: 'monospace',
-    }),
+    fontFamily: Platform.select({ ios: 'Courier', android: 'monospace' }),
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: '#38BDF8',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#0F172A',
-    fontWeight: 'bold',
-    fontSize: 18,
-  }
+  button: { backgroundColor: '#38BDF8', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8 },
+  buttonText: { color: '#0F172A', fontWeight: 'bold', fontSize: 18 }
 });

@@ -1,50 +1,46 @@
 import { NativeModules, Platform, PermissionsAndroid } from 'react-native';
-const { ActivityController } = NativeModules;
-// 1. Define the interface so TS knows what arguments the Java methods take
-interface LiveTimerInterface {
-  startLiveActivity(endTime: number): void; // Updated to accept 1 argument
-  stopLiveActivity(): void;
-}
 
-// 2. Cast NativeModules.LiveTimer to our interface
-const { LiveTimer } = NativeModules as { LiveTimer: LiveTimerInterface };
 
-export const startLiveActivity = async (endTime: number) => { // Accept startTime here
-  if (Platform.OS === 'android') {
-    // Request permission for Android 13+
-    if (Platform.Version >= 33) {
-      const status = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-      );
-      if (status !== 'granted') {
-        console.warn("Notification permission denied");
-        return;
-      }
-    }
+// Standardize the Native Module access
+const NativeActivity = Platform.select({
+  ios: NativeModules.ActivityController,
+  android: NativeModules.LiveTimer, // Match your actual Java getName()
+});
 
-    if (LiveTimer) {
-      // 3. Pass the startTime to the native Java method
-      LiveTimer.startLiveActivity(endTime);
-    } else {
-      console.error("LiveTimer module not found. Run 'npx expo run:android'");
-    }
-  } 
-  else if (Platform.OS === 'ios') {
-    // Convert ms to seconds for Swift
-    ActivityController.startLiveActivity(endTime / 1000);
+export const startLiveActivity = async (endTime: number, timerName: string = "Timer") => {
+  // 1. Android Permission Guard
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    const granted = await PermissionsAndroid.request('android.permission.POST_NOTIFICATIONS');
+    if (granted !== 'granted') return;
+  }
+
+  // 2. Unified Execution
+  if (!NativeActivity) {
+    console.error("Native Activity module not linked.");
+    return;
+  }
+
+  // iOS expects seconds, Android usually handles ms (or depends on your Java logic)
+  const formattedTime = Platform.OS === 'ios' ? endTime / 1000 : endTime;
+  
+  // Call the native side (names must match your @objc and @ReactMethod)
+  NativeActivity.startLiveActivity(formattedTime, timerName);
+};
+
+const updateLiveActivity = (endTime: number, isExpiring: boolean) => {
+  if (Platform.OS === 'ios') {
+    NativeActivity?.updateLiveActivity(endTime / 1000, isExpiring);
   }
 };
 
 export const stopLiveActivity = () => {
-  if (Platform.OS === 'android' && LiveTimer) {
-    LiveTimer.stopLiveActivity();
-  }
-  else if (Platform.OS === 'ios') {
-    ActivityController.stopLiveActivity();
-  }
+  NativeActivity?.stopLiveActivity();
 };
 
-export default {
+const LiveTimer = {
   startLiveActivity,
+  updateLiveActivity,
   stopLiveActivity,
 };
+
+export default LiveTimer;

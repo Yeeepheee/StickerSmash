@@ -14,10 +14,16 @@ import EmojiPicker from '@/components/EmojiPicker';
 import EmojiList from '@/components/EmojiList';
 import EmojiSticker from '@/components/EmojiSticker';
 import Timer from '@/components/Timer';
+import * as Notifications from 'expo-notifications';
 
+// Ensure this runs when your app starts
 const PlaceholderImage = require('@/assets/images/background-image.png');
 const RNShared = NativeModules.RNShared;
 
+// const { status } = await Notifications.requestPermissionsAsync();
+// if (status !== 'granted') {
+//   alert('Failed to get push token for push notification!');
+// }
 export default function Index() {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
@@ -25,10 +31,41 @@ export default function Index() {
   const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType | undefined>(undefined);
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions({granularPermissions: ['photo']});
   const imageRef = useRef<View>(null);
+  
+  Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    // Add these two lines to satisfy the new TypeScript requirements:
+    shouldShowBanner: true, 
+    shouldShowList: true,
+  }),
+});
+
+  useEffect(() => {
+    // 2. Request permissions on mount
+    async function requestPermissions() {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission for notifications was denied');
+      }
+    }
+    
+    requestPermissions();
+
+    // 3. Listen for incoming notifications (useful for debugging)
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification Received:', notification);
+    });
+
+    return () => subscription.remove();
+  }, []);
+
 
   // 1. Create state to store dimensions
   const [containerDimensions, setContainerDimensions] = useState({ x:0, y:0, width: 0, height: 0 });
-
+  
   // 2. Define the missing function
   const onContainerLayout = (event: { nativeEvent: { layout: { x: any, y:any, width: any; height: any; }; }; }) => {
     const {x, y, width, height } = event.nativeEvent.layout;
