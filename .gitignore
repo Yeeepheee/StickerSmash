@@ -1,0 +1,80 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native Secrets & Keys (DO NOT COMMIT)
+.kotlin/
+*.orig.*
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+android/local.properties
+android/key.properties
+
+# Metro & Debug
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS & IDEs
+.DS_Store
+*.pem
+.idea/
+.vscode/
+
+# local env files
+.env*.local
+*.tsbuildinfo
+
+# =========================================================
+# NATIVE DIRECTORIES (UN-IGNORE LOGIC)
+# =========================================================
+/android/
+/ios/
+
+# ---------------------------------------------------------
+# ANDROID: Re-include Source, Config & Wrapper
+# ---------------------------------------------------------
+!/android/app/
+!/android/app/src/
+!/android/app/src/main/
+!/android/app/src/main/**/*
+
+# Build scripts & Gradle Wrapper
+!/android/build.gradle
+!/android/app/build.gradle
+!/android/settings.gradle
+!/android/gradle.properties
+!/android/gradle/
+!/android/gradle/wrapper/**/*
+
+# ---------------------------------------------------------
+# IOS: Re-include Source & Project
+# ---------------------------------------------------------
+!/ios/StickerSmash/
+!/ios/StickerSmash/**/*
+!/ios/TimerWidget/
+!/ios/TimerWidget/**/*
+
+# Project files
+!/ios/Podfile
+!/ios/Podfile.lock
+!/ios/StickerSmash.xcodeproj/
+!/ios/StickerSmash.xcworkspace/
+
+# =========================================================
+# CLEANUP (Block the junk inside un-ignored folders)
+# =========================================================
+**/build/
+**/.gradle/
+**/DerivedData/
+ios/Pods/
