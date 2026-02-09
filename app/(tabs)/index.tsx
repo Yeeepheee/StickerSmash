@@ -2,7 +2,7 @@ import { Text, View, StyleSheet, Platform, NativeModules } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState, useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
 
 import domtoimage from 'dom-to-image';
@@ -44,7 +44,9 @@ export default function Index() {
 });
 
   useEffect(() => {
-    // 2. Request permissions on mount
+    // Only run this on Android or iOS
+    if (Platform.OS === 'web') return;
+
     async function requestPermissions() {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -54,7 +56,6 @@ export default function Index() {
     
     requestPermissions();
 
-    // 3. Listen for incoming notifications (useful for debugging)
     const subscription = Notifications.addNotificationReceivedListener(notification => {
       console.log('Notification Received:', notification);
     });
@@ -150,9 +151,15 @@ export default function Index() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-    <Text>
-      <Timer/>
-    </Text>
+    <View style={styles.timerList}>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timerScroll}>
+        <Timer title="Pizza" timerId="t1" initialSeconds={600} />
+        <Timer title="Gym" timerId="t2" initialSeconds={60} />
+        <Timer title="Laundry" timerId="t3" initialSeconds={1800} />
+        <Timer title="Focus" timerId="t4" initialSeconds={1500} />
+        {/* You can add up to 10 or more here */}
+      </ScrollView>
+    </View>
     <View style={styles.container}>
       <View style={styles.imageContainer}>
          <View ref={imageRef} collapsable={false}>
@@ -205,5 +212,10 @@ const styles = StyleSheet.create({
   },
   EmojiSticker: {
 
-  }
+  },
+  timerList: {
+    paddingTop: 50, // Move it down from the status bar
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
 });

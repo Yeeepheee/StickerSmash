@@ -1,67 +1,58 @@
 import WidgetKit
 import SwiftUI
+import ActivityKit
 
 struct TimerWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
+        // Use the unified TimerAttributes
         ActivityConfiguration(for: TimerAttributes.self) { context in
-            // Lock Screen UI
+            // Lock Screen / Notification UI
             HStack {
                 VStack(alignment: .leading) {
-                    Text(context.attributes.timerName).font(.headline)
-                    Text("Time Remaining")
+                    Text(context.attributes.title) // Displays "Pizza", "Gym", etc.
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("ID: \(context.attributes.timerId)") // Just for verification
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
                 Spacer()
-                Text(context.state.endTime, style: .timer) // NATIVE COUNTDOWN
-                    .font(.title)
+                // style: .timer automatically handles the countdown 1Hz tick natively
+                Text(context.state.endTime, style: .timer)
+                    .font(.system(.title, design: .monospaced))
+                    .foregroundColor(.cyan)
             }
             .padding()
+            .background(Color.black.opacity(0.8))
         } dynamicIsland: { context in
             DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) { Text("⏳") }
+                // Expanded UI (Long press)
+                DynamicIslandExpandedRegion(.leading) {
+                    Image(systemName: "timer")
+                        .foregroundColor(.cyan)
+                }
                 DynamicIslandExpandedRegion(.trailing) {
                     Text(context.state.endTime, style: .timer)
+                        .font(.title2)
+                        .monospacedDigit()
+                        .foregroundColor(.cyan)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text(context.attributes.timerName)
+                    Text(context.attributes.title)
+                        .font(.headline)
                 }
             } compactLeading: {
                 Text("⏳")
             } compactTrailing: {
+                // The compact view shown when only one activity is active
                 Text(context.state.endTime, style: .timer)
+                    .monospacedDigit()
+                    .foregroundColor(.cyan)
+                    .frame(width: 50)
             } minimal: {
+                // Minimal "bubble" shown when multiple apps have live activities
                 Text("⏳")
             }
         }
     }
-}
-
-
-// Ensure you target iOS 17.0+ for the #Preview macro
-@available(iOS 17.0, *)
-#Preview("Lock Screen", as: .content, using: TimerAttributes(timerName: "Pizza Timer")) {
-    TimerWidgetLiveActivity()
-} contentStates: {
-    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 5)) // 5 mins remaining
-    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(10))      // 10 secs remaining
-}
-
-@available(iOS 17.0, *)
-#Preview("Dynamic Island Compact", as: .dynamicIsland(.compact), using: TimerAttributes(timerName: "Meeting")) {
-    TimerWidgetLiveActivity()
-} contentStates: {
-    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 15))
-}
-
-@available(iOS 17.0, *)
-#Preview("Dynamic Island Expanded", as: .dynamicIsland(.expanded), using: TimerAttributes(timerName: "Workout")) {
-    TimerWidgetLiveActivity()
-} contentStates: {
-    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60 * 25))
-}
-
-@available(iOS 17.0, *)
-#Preview("Dynamic Island Minimal", as: .dynamicIsland(.minimal), using: TimerAttributes(timerName: "Egg Timer")) {
-    TimerWidgetLiveActivity()
-} contentStates: {
-    TimerAttributes.ContentState(endTime: Date().addingTimeInterval(60))
 }

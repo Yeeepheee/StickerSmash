@@ -2,8 +2,10 @@
 
 @interface RCT_EXTERN_MODULE(ActivityController, NSObject)
 
-RCT_EXTERN_METHOD(startLiveActivity:(double)endTime timerName:(NSString *)timerName)
-RCT_EXTERN_METHOD(updateLiveActivity:(double)endTime isExpiring:(BOOL)isExpiring)
-RCT_EXTERN_METHOD(stopLiveActivity)
+// Match the signature: startLiveActivity(endTime, title, timerId)
+RCT_EXTERN_METHOD(startLiveActivity:(double)endTime title:(NSString *)title timerId:(NSString *)timerId)
+
+// Match the signature: stopLiveActivity(timerId)
+RCT_EXTERN_METHOD(stopLiveActivity:(NSString *)timerId)
 
 @end
