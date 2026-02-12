@@ -59,7 +59,6 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        // --- USING YOUR CUSTOM BUILDER LOGIC ---
         if (Build.VERSION.SDK_INT >= 36) { // Android 16+ 
             Notification.ProgressStyle progressStyle = new Notification.ProgressStyle()
                 .setProgressPoints(Collections.singletonList(new Notification.ProgressStyle.Point(50)))
@@ -76,7 +75,6 @@ public class LiveTimerModule extends ReactContextBaseJavaModule {
                 .setUsesChronometer(true)
                 .setChronometerCountDown(true);
 
-            // This ensures the system treats it as a "Live Activity" style notification
             builder.getExtras().putBoolean("android.requestPromotedOngoing", true);
             manager.notify(notificationId, builder.build());
             

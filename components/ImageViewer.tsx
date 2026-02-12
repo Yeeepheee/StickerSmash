@@ -1,11 +1,10 @@
-// components/ImageViewer.tsx
 import { ImageSourcePropType, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { Image } from 'expo-image';
 
 type Props = {
   imgSource: ImageSourcePropType;
   selectedImage?: string;
-  onLayout?: (event: LayoutChangeEvent) => void; // Add this prop
+  onLayout?: (event: LayoutChangeEvent) => void;
 };
 
 export default function ImageViewer({ imgSource, selectedImage, onLayout }: Props) {
@@ -15,7 +14,7 @@ export default function ImageViewer({ imgSource, selectedImage, onLayout }: Prop
     <Image 
       source={imageSource} 
       style={styles.image} 
-      onLayout={onLayout} // Attach it here
+      onLayout={onLayout}
     />
   );
 }

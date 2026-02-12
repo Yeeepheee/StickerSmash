@@ -22,7 +22,7 @@ export default function EmojiSticker({parentInfo, imageSize, stickerSource }: Pr
     const translateY = useSharedValue(0);
     const maxScale = 500;
     const minScale = 100;
-    //##########################################
+
 
     const doubleTap = Gesture.Tap()
         .numberOfTaps(2)
@@ -34,7 +34,6 @@ export default function EmojiSticker({parentInfo, imageSize, stickerSource }: Pr
             }
         });
 
-        //##########################################
         const drag = Gesture.Pan().onChange(event => {
             translateX.value += event.changeX;
             translateY.value += event.changeY;
@@ -54,7 +53,7 @@ export default function EmojiSticker({parentInfo, imageSize, stickerSource }: Pr
                 ],
             };
         });
-        //##########################################
+
         const pinchgGesture = Gesture.Pinch().hitSlop({ left: 100, right: 100, top: 100, bottom: 100}).onChange((e) => {
             scaleImage.value *= e.scaleChange;
         });
@@ -69,7 +68,6 @@ export default function EmojiSticker({parentInfo, imageSize, stickerSource }: Pr
         const combined = Gesture.Simultaneous(doubleTap, pinchgGesture);
         return (
             
-
     <Animated.View style={[containerStyle]}>
         <GestureDetector gesture={combined}>
             <Animated.View style={{ backgroundColor: 'transparent' }}>

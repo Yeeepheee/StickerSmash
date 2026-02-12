@@ -33,7 +33,6 @@ public class RNShared extends ReactContextBaseJavaModule {
         editor.putString(key, data);
         editor.commit();
 
-        // Use 'context' (ReactApplicationContext) instead of 'getCurrentActivity().getApplicationContext()'
         Intent intent = new Intent(context, NewAppWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 

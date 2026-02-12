@@ -36,17 +36,14 @@ public class NewAppWidget extends AppWidgetProvider {
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
 
-        // Required for background processing in a BroadcastReceiver
         final PendingResult pendingResult = goAsync();
 
         new Thread(() -> {
             try {
-                // FIXED: Now handles both web URLs and local file paths
                 Bitmap bitmap = loadImage(imageURL);
 
                 if (bitmap != null) {
                     Bitmap resized = resizeBitmap(bitmap, 600, 600);
-                    // Use RGB_565 to avoid the 1MB "Binder transaction" limit crash
                     Bitmap finalBitmap = resized.copy(Bitmap.Config.RGB_565, false);
 
                     views.setViewVisibility(R.id.appwidget_image, View.VISIBLE);
@@ -65,15 +62,11 @@ public class NewAppWidget extends AppWidgetProvider {
         }).start();
     }
 
-    /**
-     * FIXED LOGIC: Checks if the path is a web URL or a local file path
-     */
     private Bitmap loadImage(String src) {
         if (src == null || src.isEmpty()) return null;
 
         try {
             if (src.startsWith("http")) {
-                // Handle Web URL
                 URL url = new URL(src);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
@@ -81,7 +74,6 @@ public class NewAppWidget extends AppWidgetProvider {
                 InputStream input = connection.getInputStream();
                 return BitmapFactory.decodeStream(input);
             } else {
-                // Handle Local File Path (from captureRef)
                 String localPath = src.replace("file://", "");
                 return BitmapFactory.decodeFile(localPath);
             }

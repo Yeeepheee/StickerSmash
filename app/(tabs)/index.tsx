@@ -16,14 +16,9 @@ import EmojiSticker from '@/components/EmojiSticker';
 import Timer from '@/components/Timer';
 import * as Notifications from 'expo-notifications';
 
-// Ensure this runs when your app starts
 const PlaceholderImage = require('@/assets/images/background-image.png');
 const RNShared = NativeModules.RNShared;
 
-// const { status } = await Notifications.requestPermissionsAsync();
-// if (status !== 'granted') {
-//   alert('Failed to get push token for push notification!');
-// }
 export default function Index() {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
@@ -37,14 +32,12 @@ export default function Index() {
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    // Add these two lines to satisfy the new TypeScript requirements:
     shouldShowBanner: true, 
     shouldShowList: true,
   }),
 });
 
   useEffect(() => {
-    // Only run this on Android or iOS
     if (Platform.OS === 'web') return;
 
     async function requestPermissions() {
@@ -63,19 +56,15 @@ export default function Index() {
     return () => subscription.remove();
   }, []);
 
-
-  // 1. Create state to store dimensions
   const [containerDimensions, setContainerDimensions] = useState({ x:0, y:0, width: 0, height: 0 });
   
-  // 2. Define the missing function
   const onContainerLayout = (event: { nativeEvent: { layout: { x: any, y:any, width: any; height: any; }; }; }) => {
     const {x, y, width, height } = event.nativeEvent.layout;
     console.log("height: " + height + ", width: " + width + ", x: " + x + ", y: " + y);
-    setContainerDimensions({x, y, width, height }); // Save the parent's size
+    setContainerDimensions({x, y, width, height });
   };
   
   const updateWidget = (localUri:any) => {
-    // Make sure the key matches exactly what you use in Java: "sharedImageUrl"
     RNShared.setData("sharedImageUrl", localUri, (result:any) => {
         console.log("Widget updated:", result);
     });
@@ -214,7 +203,7 @@ const styles = StyleSheet.create({
 
   },
   timerList: {
-    paddingTop: 50, // Move it down from the status bar
+    paddingTop: 50,
     width: '100%',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
