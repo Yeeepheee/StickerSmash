@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["MyTimerModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.mywidgetlibrary.MyWidgetLibraryModule"]
+  }
+}
