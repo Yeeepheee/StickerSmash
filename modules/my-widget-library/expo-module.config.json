@@ -4,6 +4,6 @@
     "modules": ["MyTimerModule"]
   },
   "android": {
-    "modules": ["expo.modules.mywidgetlibrary.MyWidgetLibraryModule"]
+    "modules": ["expo.modules.mywidgetlibrary.MyTimerModule"]
   }
 }

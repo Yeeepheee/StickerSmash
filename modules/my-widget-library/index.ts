@@ -1,32 +1,21 @@
-import { requireNativeModule, Platform } from 'expo-modules-core';
+import { requireNativeModule } from 'expo-modules-core';
 
-// 'MyTimerModule' must match the Name("...") in your Swift file
-const NativeModule = requireNativeModule('MyTimerModule');
+const NativeTimer = requireNativeModule('MyTimerModule');
 
-const LiveTimer = {
+export default {
   /**
-   * Starts a native Live Activity (iOS) or Notification Timer (Android)
+   * Triggers the platform-specific live timer.
+   * iOS: Dynamic Island / Lock Screen Activity
+   * Android: Ongoing Notification with Progress
    */
-  startLiveActivity: (endTime: number, title: string, timerId: string) => {
-    if (Platform.OS === 'ios') {
-      // In Expo Modules, functions are called directly on the required module
-      NativeModule.startLiveActivity(endTime, title, timerId);
-    } else {
-      // Assuming you have an Android implementation in the same module
-      NativeModule.startLiveActivityAndroid?.(endTime, title, timerId);
-    }
+  startLiveActivity(endTime: number, title: string, timerId: string): void {
+    NativeTimer.startLiveActivity(endTime, title, timerId);
   },
 
   /**
-   * Stops a specific native timer by its unique ID
+   * Clears the timer and removes the notification/activity.
    */
-  stopLiveActivity: (timerId: string) => {
-    if (Platform.OS === 'ios') {
-      NativeModule.stopLiveActivity(timerId);
-    } else {
-      NativeModule.stopLiveActivityAndroid?.(timerId);
-    }
+  stopLiveActivity(timerId: string): void {
+    NativeTimer.stopLiveActivity(timerId);
   }
 };
-
-export default LiveTimer;
