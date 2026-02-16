@@ -1,5 +1,7 @@
 import Foundation
 import ActivityKit
+import UIKit
+
 
 struct TimerAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
@@ -14,46 +16,82 @@ struct TimerAttributes: ActivityAttributes {
 @objc(ActivityController)
 class ActivityController: NSObject {
     
-    //@objc(startLiveActivity:title:timerId:)
-    // func startLiveActivity(endTime: Double, title: String, timerId: String) {
-    //     let attributes = TimerAttributes(title: title, timerId: timerId)
-        
-    //     let state = TimerAttributes.ContentState(endTime: Date(timeIntervalSince1970: endTime / 1000))
-    //     let content = ActivityContent(state: state, staleDate: nil)
-        
-    //     do {
-    //         // Specified the generic type <TimerAttributes> to ensure compiler clarity
-    //         _ = try Activity<TimerAttributes>.request(attributes: attributes, content: content)
-    //     } catch {
-    //         print("❌ iOS Error: \(error.localizedDescription)")
-    //     }
-    // }
-
-@objc(startLiveActivity:title:timerId:)
-func startLiveActivity(endTime: Double, title: String, timerId: String) {
-    let targetDate = Date(timeIntervalSince1970: endTime / 1000)
-    let attributes = TimerAttributes(title: title, timerId: timerId)
-    let state = TimerAttributes.ContentState(endTime: targetDate)
-
-    // STALE DATE tells iOS: "After this time, this notification is old/invalid"
-    let content = ActivityContent(state: state, staleDate: targetDate)
+    static let shared = ActivityController()
     
-    do {
-        _ = try Activity<TimerAttributes>.request(attributes: attributes, content: content)
-    } catch {
-        print("Error: \(error)")
+    override init() {
+        super.init()
+        
+        // Clean up expired activities when app becomes active
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(checkForExpiredActivities),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
-}
     
-
+    // MARK: - Start
+    
+    @objc(startLiveActivity:title:timerId:)
+    func startLiveActivity(endTime: Double, title: String, timerId: String) {
+        
+        let targetDate = Date(timeIntervalSince1970: endTime / 1000)
+        
+        let attributes = TimerAttributes(
+            title: title,
+            timerId: timerId
+        )
+        
+        let state = TimerAttributes.ContentState(
+            endTime: targetDate
+        )
+        
+        let content = ActivityContent(
+            state: state,
+            staleDate: targetDate   // Important for Apple-style dimming
+        )
+        
+        do {
+            _ = try Activity<TimerAttributes>.request(
+                attributes: attributes,
+                content: content
+            )
+        } catch {
+            print("Failed to start Live Activity:", error.localizedDescription)
+        }
+    }
+    
+    // MARK: - Stop Manually
+    
     @objc(stopLiveActivity:)
     func stopLiveActivity(timerId: String) {
         Task {
-            for activity in Activity<TimerAttributes>.activities where activity.attributes.timerId == timerId {
-                await activity.end(nil, dismissalPolicy: .immediate)
+            for activity in Activity<TimerAttributes>.activities {
+                if activity.attributes.timerId == timerId {
+                    await end(activity: activity)
+                }
             }
         }
     }
-
-    @objc static func requiresMainQueueSetup() -> Bool { return true }
+    
+    // MARK: - Local Cleanup
+    
+    @objc private func checkForExpiredActivities() {
+        Task {
+            for activity in Activity<TimerAttributes>.activities {
+                if activity.content.state.endTime <= Date() {
+                    await end(activity: activity)
+                }
+            }
+        }
+    }
+    
+    private func end(activity: Activity<TimerAttributes>) async {
+        let finalState = TimerAttributes.ContentState(endTime: Date())
+        
+        await activity.end(
+            ActivityContent(state: finalState, staleDate: nil),
+            dismissalPolicy: .immediate
+        )
+    }
 }
