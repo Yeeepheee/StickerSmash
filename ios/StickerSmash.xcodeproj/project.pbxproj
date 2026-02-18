@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,8 @@
 		9568575EDB5E55BD52C4C660 /* libPods-StickerSmash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D9122B837A542BB3005B0E70 /* libPods-StickerSmash.a */; };
 		B1EE3146EC4CD0482C5C3169 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B4567B471C257F92EAED86 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		D53068D72F4386A000FE6778 /* WidgetBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D53068D62F4386A000FE6778 /* WidgetBridge.m */; };
+		D53068D92F4386A900FE6778 /* WidgetBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53068D82F4386A900FE6778 /* WidgetBridge.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 		XX12B55A1EDABF083C3B51XX /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = XX470101BAEB8E0BBC8B0DXX /* WidgetKit.framework */; };
 		XX1A6800511A685AB346D2XX /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = XXA12889081EB894481655XX /* AppIntents.framework */; };
@@ -46,16 +48,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		06B4567B471C257F92EAED86 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-StickerSmash/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		06B4567B471C257F92EAED86 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-StickerSmash/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* StickerSmash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; fileEncoding = 4; includeInIndex = 0; path = StickerSmash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = StickerSmash/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = Info.plist; path = StickerSmash/Info.plist; sourceTree = "<group>"; };
-		621F1A0E852C788D516270B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = StickerSmash/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		9BB2C426FF142C491032884C /* Pods-StickerSmash.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickerSmash.debug.xcconfig"; path = "Target Support Files/Pods-StickerSmash/Pods-StickerSmash.debug.xcconfig"; sourceTree = "<group>"; };
+		621F1A0E852C788D516270B6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = StickerSmash/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		9BB2C426FF142C491032884C /* Pods-StickerSmash.debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickerSmash.debug.xcconfig"; path = "Target Support Files/Pods-StickerSmash/Pods-StickerSmash.debug.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = StickerSmash/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B6B01C76019B31D1EAE1DBE6 /* Pods-StickerSmash.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickerSmash.release.xcconfig"; path = "Target Support Files/Pods-StickerSmash/Pods-StickerSmash.release.xcconfig"; sourceTree = "<group>"; };
+		B6B01C76019B31D1EAE1DBE6 /* Pods-StickerSmash.release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickerSmash.release.xcconfig"; path = "Target Support Files/Pods-StickerSmash/Pods-StickerSmash.release.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D9122B837A542BB3005B0E70 /* libPods-StickerSmash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickerSmash.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D53068D62F4386A000FE6778 /* WidgetBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; path = WidgetBridge.m; sourceTree = "<group>"; };
+		D53068D82F4386A900FE6778 /* WidgetBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; path = WidgetBridge.swift; sourceTree = "<group>"; };
+		D9122B837A542BB3005B0E70 /* libPods-StickerSmash.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; fileEncoding = 4; includeInIndex = 0; path = "libPods-StickerSmash.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = undefined; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = StickerSmash/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* StickerSmash-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "StickerSmash-Bridging-Header.h"; path = "StickerSmash/StickerSmash-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -70,8 +74,8 @@
 		XXF15AB0A4561DDCE28123XX /* Exceptions for "widget" folder in "TimerWidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
 				"expo-target.config.js",
+				Info.plist,
 			);
 			target = XX0990C08C8192F2F0A4BAXX /* TimerWidget */;
 		};
@@ -143,7 +147,6 @@
 				9BB2C426FF142C491032884C /* Pods-StickerSmash.debug.xcconfig */,
 				B6B01C76019B31D1EAE1DBE6 /* Pods-StickerSmash.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -170,6 +173,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				D53068D62F4386A000FE6778 /* WidgetBridge.m */,
+				D53068D82F4386A900FE6778 /* WidgetBridge.swift */,
 				XX3E41C1850246162C0061XX /* expo:targets */,
 				13B07FAE1A68108700A75B9A /* StickerSmash */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -247,7 +252,7 @@
 		};
 		XX0990C08C8192F2F0A4BAXX /* TimerWidget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XX3E30122B6B967F561CAEXX /* Build configuration list for PBXNativeTarget "TimerWidget" */;
+			buildConfigurationList = XX2AEB0E20371D92B05666XX /* Build configuration list for PBXNativeTarget "TimerWidget" */;
 			buildPhases = (
 				XX074B8811C1CF8E8A3D74XX /* Frameworks */,
 				XXE45443DC38DCFE1DB622XX /* Sources */,
@@ -460,7 +465,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D53068D72F4386A000FE6778 /* WidgetBridge.m in Sources */,
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				D53068D92F4386A900FE6778 /* WidgetBridge.swift in Sources */,
 				B1EE3146EC4CD0482C5C3169 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -710,7 +717,7 @@
 			};
 			name = Debug;
 		};
-		XXD5178EB835E751D761B1XX /* Release */ = {
+		XXF2C85A540F50E1DB99CEXX /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
@@ -772,11 +779,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		XX3E30122B6B967F561CAEXX /* Build configuration list for PBXNativeTarget "TimerWidget" */ = {
+		XX2AEB0E20371D92B05666XX /* Build configuration list for PBXNativeTarget "TimerWidget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				XXC8697BD6D6267532AB98XX /* Debug */,
-				XXD5178EB835E751D761B1XX /* Release */,
+				XXF2C85A540F50E1DB99CEXX /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

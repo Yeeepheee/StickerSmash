@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
+// Import your root App component
+import App from '@/widget-builder/App'
 
 import domtoimage from 'dom-to-image';
 import Button from '@/components/Button';
@@ -140,6 +142,7 @@ export default function Index() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
+      <App/>
     <View style={styles.timerList}>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timerScroll}>
         <Timer title="Pizza" timerId="t1" initialSeconds={600} />

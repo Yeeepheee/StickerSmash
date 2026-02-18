@@ -1,0 +1,11 @@
+const { withEntitlementsPlist } = require('@expo/config-plugins');
+
+const APP_GROUP = "group.com.luminous5972.StickerSmash";
+
+module.exports = function withWidgetEntitlements(config) {
+  return withEntitlementsPlist(config, (config) => {
+    // Add the App Group to both the App and the Widget target
+    config.modResults['com.apple.security.application-groups'] = [APP_GROUP];
+    return config;
+  });
+};
