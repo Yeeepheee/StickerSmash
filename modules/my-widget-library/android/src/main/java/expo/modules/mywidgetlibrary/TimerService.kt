@@ -25,6 +25,24 @@ class TimerService : Service() {
         const val ACTION_STOP = "ACTION_STOP"
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Timer Service Channel",
+                NotificationManager.IMPORTANCE_LOW // Low priority prevents annoying sounds every update
+            ).apply {
+                description = "Used for active timers"
+            }
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
+    }
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
