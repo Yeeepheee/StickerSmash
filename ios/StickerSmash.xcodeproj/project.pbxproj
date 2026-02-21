@@ -1,9 +1,9 @@
 // !$*UTF8*$!
 {
 	archiveVersion = 1;
+	objectVersion = 77;
 	classes = {
 	};
-	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -71,7 +71,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		XXF15AB0A4561DDCE28123XX /* Exceptions for "widget" folder in "TimerWidget" target */ = {
+		XXF15AB0A4561DDCE28123XX /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"expo-target.config.js",
@@ -85,10 +85,9 @@
 		XX1E13B5D531A930BFA835XX /* widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				XXF15AB0A4561DDCE28123XX /* Exceptions for "widget" folder in "TimerWidget" target */,
+				XXF15AB0A4561DDCE28123XX /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
-			explicitFileTypes = {
-			};
+			explicitFileTypes = {};
 			explicitFolders = (
 			);
 			path = widget;
@@ -219,7 +218,7 @@
 			children = (
 				XX1E13B5D531A930BFA835XX /* widget */,
 			);
-			name = "expo:targets";
+			name = expo:targets;
 			path = ../targets;
 			sourceTree = "<group>";
 		};
@@ -252,7 +251,7 @@
 		};
 		XX0990C08C8192F2F0A4BAXX /* TimerWidget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = XX2AEB0E20371D92B05666XX /* Build configuration list for PBXNativeTarget "TimerWidget" */;
+			buildConfigurationList = XXB7C3F0BCD5FAEE1D4CB6XX /* Build configuration list for PBXNativeTarget "TimerWidget" */;
 			buildPhases = (
 				XX074B8811C1CF8E8A3D74XX /* Frameworks */,
 				XXE45443DC38DCFE1DB622XX /* Sources */,
@@ -417,6 +416,10 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StickerSmash/Pods-StickerSmash-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+			outputFileListPaths = (
+			);
+			inputFileListPaths = (
+			);
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -457,6 +460,10 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StickerSmash/Pods-StickerSmash-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+			outputFileListPaths = (
+			);
+			inputFileListPaths = (
+			);
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -676,8 +683,9 @@
 			};
 			name = Release;
 		};
-		XXC8697BD6D6267532AB98XX /* Debug */ = {
+		XX166BE55D575B9C26C4F0XX /* Release */ = {
 			isa = XCBuildConfiguration;
+			name = Release;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -686,11 +694,89 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TimerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luminous5972.StickerSmash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				DEVELOPMENT_TEAM = 5X6DZFVDUW;
+			};
+		};
+		XX1B283921E538F41872B3XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TimerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luminous5972.StickerSmash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				DEVELOPMENT_TEAM = 5X6DZFVDUW;
+			};
+		};
+		XXC8697BD6D6267532AB98XX /* Debug */ = {
+			isa = XCBuildConfiguration;
+			name = Debug;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 5X6DZFVDUW;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ../targets/widget/Info.plist;
@@ -705,7 +791,6 @@
 				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.luminous5972.StickerSmash.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -714,8 +799,89 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				DEVELOPMENT_TEAM = 5X6DZFVDUW;
 			};
-			name = Debug;
+		};
+		XXD5178EB835E751D761B1XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TimerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luminous5972.StickerSmash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				DEVELOPMENT_TEAM = 5X6DZFVDUW;
+			};
+		};
+		XXDF887072CACA24B903B2XX /* Release */ = {
+			isa = XCBuildConfiguration;
+			name = Release;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ../targets/widget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TimerWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.luminous5972.StickerSmash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				CODE_SIGN_ENTITLEMENTS = ../targets/widget/generated.entitlements;
+				DEVELOPMENT_TEAM = 5X6DZFVDUW;
+			};
 		};
 		XXF2C85A540F50E1DB99CEXX /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -779,13 +945,13 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		XX2AEB0E20371D92B05666XX /* Build configuration list for PBXNativeTarget "TimerWidget" */ = {
+		XXB7C3F0BCD5FAEE1D4CB6XX /* Build configuration list for PBXNativeTarget "TimerWidget" */ = {
 			isa = XCConfigurationList;
+			defaultConfigurationIsVisible = 0;
 			buildConfigurations = (
 				XXC8697BD6D6267532AB98XX /* Debug */,
-				XXF2C85A540F50E1DB99CEXX /* Release */,
+				XX1B283921E538F41872B3XX /* Release */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
