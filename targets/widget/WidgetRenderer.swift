@@ -1,27 +1,30 @@
+// WidgetRenderer.swift
 import SwiftUI
 
 struct WidgetRenderer: View {
     let schema: WidgetSchema
+    let images: [String: Data] // <-- Accept the image data
 
     var body: some View {
         ZStack {
             Color(hex: schema.backgroundColor ?? "#ffffff")
             
-            if schema.layout == .vstack {
-                VStack {
-                    ForEach(schema.children) { node in
-                        renderNode(node)
+            Group {
+                if schema.layout == .vstack {
+                    VStack {
+                        ForEach(schema.children) { node in
+                            renderNode(node)
+                        }
+                    }
+                } else {
+                    HStack {
+                        ForEach(schema.children) { node in
+                            renderNode(node)
+                        }
                     }
                 }
-                .padding(8)
-            } else {
-                HStack {
-                    ForEach(schema.children) { node in
-                        renderNode(node)
-                    }
-                }
-                .padding(8)
             }
+            .padding(8)
         }
     }
 
@@ -32,14 +35,26 @@ struct WidgetRenderer: View {
             Text(textNode.value)
                 .font(.system(size: textNode.fontSize))
                 .foregroundColor(Color(hex: textNode.color))
-                .frame(maxWidth: .infinity,
-                       alignment: alignment(from: textNode.alignment))
+                .frame(maxWidth: .infinity, alignment: alignment(from: textNode.alignment))
+        
         case .spacer(_):
             Spacer()
+
+        case .image(let imageNode):
+            // Check if we successfully downloaded data for this URL
+            if let imageData = images[imageNode.src], let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: imageNode.width, height: imageNode.height)
+            } else {
+                // Fallback if the image didn't download or the URL is broken
+                Color.gray 
+                    .frame(width: imageNode.width, height: imageNode.height)
+            }
         }
     }
     
-    // Map string alignment to SwiftUI alignment
     func alignment(from str: String) -> Alignment {
         switch str {
         case "leading": return .leading

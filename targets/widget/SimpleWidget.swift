@@ -2,37 +2,65 @@ import WidgetKit
 import SwiftUI
 
 // MARK: - Timeline Entry
+// SimpleWidget.swift
+
 struct SimpleWidgetEntry: TimelineEntry {
     let date: Date
     let schema: WidgetSchema?
+    let images: [String: Data] // <-- Add this to hold pre-fetched images
 }
 
 // MARK: - Timeline Provider
+// SimpleWidget.swift
+
 struct SimpleWidgetProvider: TimelineProvider {
     
     func placeholder(in context: Context) -> SimpleWidgetEntry {
-        SimpleWidgetEntry(date: Date(), schema: nil)
+        SimpleWidgetEntry(date: Date(), schema: nil, images: [:])
     }
     
     func getSnapshot(in context: Context, completion: @escaping (SimpleWidgetEntry) -> Void) {
-        let entry = SimpleWidgetEntry(date: Date(), schema: loadSchema())
+        // For a quick snapshot, you can just return empty images, or perform the fetch.
+        let entry = SimpleWidgetEntry(date: Date(), schema: loadSchema(), images: [:])
         completion(entry)
     }
     
-func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleWidgetEntry>) -> Void) {
-
-    let entry = SimpleWidgetEntry(
-        date: Date(),
-        schema: loadSchema()
-    )
-
-    let timeline = Timeline(entries: [entry], policy: .atEnd)
-    completion(timeline)
-}
-
-
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleWidgetEntry>) -> Void) {
+        let schema = loadSchema()
+        var downloadedImages: [String: Data] = [:]
+        
+        let dispatchGroup = DispatchGroup()
+        
+        // 1. Find all image nodes and download their data
+        if let children = schema?.children {
+            for node in children {
+                if case .image(let imageNode) = node, let url = URL(string: imageNode.src) {
+                    dispatchGroup.enter()
+                    
+                    URLSession.shared.dataTask(with: url) { data, response, error in
+                        if let data = data {
+                            // Store the data keyed by the URL string
+                            downloadedImages[imageNode.src] = data 
+                        }
+                        dispatchGroup.leave()
+                    }.resume()
+                }
+            }
+        }
+        
+        // 2. Wait for all downloads to finish, then create the timeline
+        dispatchGroup.notify(queue: .main) {
+            let entry = SimpleWidgetEntry(
+                date: Date(),
+                schema: schema,
+                images: downloadedImages // <-- Pass the downloaded data
+            )
+            
+            let timeline = Timeline(entries: [entry], policy: .atEnd)
+            completion(timeline)
+        }
+    }
     
-    // Load JSON schema from App Group
     private func loadSchema() -> WidgetSchema? {
         let defaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
         guard let json = defaults?.string(forKey: "widgetSchema"),
@@ -42,12 +70,15 @@ func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleWidg
 }
 
 // MARK: - Widget View
+// SimpleWidget.swift
+
 struct SimpleWidgetEntryView: View {
     let entry: SimpleWidgetEntry
     
     var body: some View {
         if let schema = entry.schema {
-            WidgetRenderer(schema: schema)
+            // Pass the images down to the renderer
+            WidgetRenderer(schema: schema, images: entry.images) 
         } else {
             Text("No Content")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -8,7 +8,6 @@ struct WidgetSchema: Decodable {
     let children: [WidgetNode]
 }
 
-// MARK: - Layout Types
 enum LayoutType: String, Decodable {
     case vstack
     case hstack
@@ -18,28 +17,27 @@ enum LayoutType: String, Decodable {
 enum WidgetNode: Decodable, Identifiable {
     case text(TextNode)
     case spacer(SpacerNode)
+    case image(ImageNode) // Added Image case
     
     var id: UUID {
         switch self {
-        case .text(let node):
-            return node.id
-        case .spacer(let node):
-            return node.id
+        case .text(let node): return node.id
+        case .spacer(let node): return node.id
+        case .image(let node): return node.id // Added
         }
     }
     
-    // Custom decoding
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         
         switch type {
         case "text":
-            let node = try TextNode(from: decoder)
-            self = .text(node)
+            self = .text(try TextNode(from: decoder))
         case "spacer":
-            let node = try SpacerNode(from: decoder)
-            self = .spacer(node)
+            self = .spacer(try SpacerNode(from: decoder))
+        case "image": // Added decoding logic for images
+            self = .image(try ImageNode(from: decoder))
         default:
             throw DecodingError.dataCorruptedError(
                 forKey: .type,
@@ -54,18 +52,23 @@ enum WidgetNode: Decodable, Identifiable {
     }
 }
 
-// MARK: - Text Node
+// MARK: - Node Definitions
 struct TextNode: Decodable, Identifiable {
     let id = UUID()
-    let type: String
     let value: String
     let fontSize: Double
     let color: String
     let alignment: String
 }
 
-// MARK: - Spacer Node
 struct SpacerNode: Decodable, Identifiable {
     let id = UUID()
-    let type: String
+}
+
+// Added ImageNode to match widgetCompiler.tsx output
+struct ImageNode: Decodable, Identifiable {
+    let id = UUID()
+    let src: String
+    let width: Double
+    let height: Double
 }
