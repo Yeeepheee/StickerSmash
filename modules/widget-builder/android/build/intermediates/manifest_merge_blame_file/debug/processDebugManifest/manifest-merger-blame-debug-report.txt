@@ -1,0 +1,31 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="expo.modules.widgetbuilder" >
+4
+5    <uses-sdk android:minSdkVersion="24" />
+6
+7    <application>
+7-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:2:43-11:19
+8        <receiver
+8-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:9-10:20
+9            android:name="expo.modules.widgetbuilder.DynamicWidgetReceiver"
+9-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:19-56
+10            android:exported="true" >
+10-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:57-80
+11            <intent-filter>
+11-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:4:13-6:29
+12                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+12-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:5:17-83
+12-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:5:25-81
+13            </intent-filter>
+14
+15            <meta-data
+15-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:7:13-9:62
+16                android:name="android.appwidget.provider"
+16-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:8:17-58
+17                android:resource="@xml/dynamic_widget_info" />
+17-->/Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:9:17-60
+18        </receiver>
+19    </application>
+20
+21</manifest>

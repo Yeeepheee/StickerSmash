@@ -1,7 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-apply plugin: "org.jetbrains.kotlin.plugin.compose"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -131,10 +130,6 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
-    buildFeatures {
-        viewBinding true
-        compose true
-    }
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -160,9 +155,6 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("androidx.glance:glance-appwidget:1.1.0")
-    implementation ("androidx.glance:glance-material3:1.1.0")
-    implementation 'androidx.glance:glance-appwidget:1.1.1'
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

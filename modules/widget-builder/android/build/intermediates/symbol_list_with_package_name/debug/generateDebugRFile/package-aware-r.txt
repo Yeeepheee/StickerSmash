@@ -1,0 +1,4 @@
+expo.modules.widgetbuilder
+id appwidget_text
+layout dynamic_widget
+xml dynamic_widget_info

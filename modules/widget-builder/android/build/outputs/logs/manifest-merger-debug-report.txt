@@ -1,0 +1,37 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:1:1-12:12
+INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:1:1-12:12
+	package
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:2:5-41
+		INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:1:11-69
+application
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:2:43-11:19
+receiver#expo.modules.widgetbuilder.DynamicWidgetReceiver
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:9-10:20
+	android:exported
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:57-80
+	android:name
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:3:19-56
+intent-filter#action:name:android.appwidget.action.APPWIDGET_UPDATE
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:4:13-6:29
+action#android.appwidget.action.APPWIDGET_UPDATE
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:5:17-83
+	android:name
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:5:25-81
+meta-data#android.appwidget.provider
+ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:7:13-9:62
+	android:resource
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:9:17-60
+	android:name
+		ADDED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml:8:17-58
+uses-sdk
+INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml
+INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/Programming/Programming/test2/StickerSmash/modules/widget-builder/android/src/main/AndroidManifest.xml

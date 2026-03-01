@@ -1,0 +1,84 @@
+// 1. INITIALIZE BUILDSCRIPT 
+// This block evaluates first. If the host project is Kotlin 2.0+, we inject 
+// the new Compose Compiler plugin into the classpath so it can be applied later.
+buildscript {
+    def hostKotlinVersion = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : "1.9.23"
+    if (hostKotlinVersion.startsWith("2.")) {
+        repositories {
+            mavenCentral()
+            google()
+        }
+        dependencies {
+            classpath("org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin:${hostKotlinVersion}")
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+// 2. CHECK VERSION IN MAIN SCRIPT SCOPE
+def hostKotlinVersion = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : "1.9.23"
+def isKotlin2 = hostKotlinVersion.startsWith("2.")
+
+// 3. DYNAMICALLY APPLY THE PLUGIN (Kotlin 2.0+ Only)
+if (isKotlin2) {
+    apply plugin: "org.jetbrains.kotlin.plugin.compose"
+}
+
+group = 'expo.modules.widgetbuilder'
+version = '0.7.6'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 36)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 24)
+      targetSdkVersion safeExtGet("targetSdkVersion", 36)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.widgetbuilder"
+  defaultConfig {
+    versionCode 1
+    versionName "0.7.6"
+  }
+  lintOptions {
+    abortOnError false
+  }
+  
+  buildFeatures {
+    compose true
+  }
+
+  // 4. FALLBACK FOR OLDER PROJECTS (Kotlin 1.9.x)
+  if (!isKotlin2) {
+    composeOptions {
+      // Version 1.5.11 maps safely to Kotlin 1.9.23 (Expo SDK 51 default)
+      kotlinCompilerExtensionVersion = "1.5.11" 
+    }
+  }
+}
+
+dependencies {
+  implementation "androidx.glance:glance-appwidget:1.0.0"
+  implementation "androidx.glance:glance-material3:1.0.0"
+  
+  implementation project(':expo-modules-core')
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$hostKotlinVersion"
+}

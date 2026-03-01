@@ -1,0 +1,5 @@
+R_DEF: Internal format may change without notice
+local
+id appwidget_text
+layout dynamic_widget
+xml dynamic_widget_info
