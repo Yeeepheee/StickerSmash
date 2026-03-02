@@ -27,7 +27,7 @@ class DynamicWidget : GlanceAppWidget() {
         val schema = JSONObject(jsonString)
         val children = schema.optJSONArray("children")
 
-        // 1. Pre-fetch images natively to avoid heavy dependencies like Coil/Glide
+        // 1. Pre-fetch images natively
         val bitmaps = mutableMapOf<String, Bitmap>()
         children?.let {
             for (i in 0 until it.length()) {
@@ -50,34 +50,35 @@ class DynamicWidget : GlanceAppWidget() {
                 .background(ColorProvider(Color(android.graphics.Color.parseColor(bgColor))))
                 .padding(8.dp)
 
-            // 2. Cleaned up layout switching
             if (layoutType == "hstack") {
                 Row(modifier = rootModifier, verticalAlignment = Alignment.CenterVertically) {
-                    RenderChildren(children, bitmaps)
+                    children?.let { array ->
+                        for (i in 0 until array.length()) {
+                            val node = array.getJSONObject(i)
+                            if (node.optString("type") == "spacer") {
+                                Spacer(modifier = GlanceModifier.defaultWeight())
+                            } else {
+                                RenderNode(node, bitmaps)
+                            }
+                        }
+                    }
                 }
             } else {
                 Column(modifier = rootModifier, horizontalAlignment = Alignment.CenterHorizontally) {
-                    RenderChildren(children, bitmaps)
+                    children?.let { array ->
+                        for (i in 0 until array.length()) {
+                            val node = array.getJSONObject(i)
+                            if (node.optString("type") == "spacer") {
+                                Spacer(modifier = GlanceModifier.defaultWeight())
+                            } else {
+                                RenderNode(node, bitmaps)
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-
-    @Composable
-    private fun RenderChildren(children: JSONArray?, bitmaps: Map<String, Bitmap>) {
-        children?.let {
-            for (i in 0 until it.length()) {
-                val node = it.getJSONObject(i)
-                if (node.optString("type") == "spacer") {
-                    Spacer(modifier = GlanceModifier)
-                } else {
-                    RenderNode(node, bitmaps)
-                }
-            }
-        }
-    }
-
-
+    } // This brace was missing! It closes provideGlance.
 
     @Composable
     private fun RenderNode(node: JSONObject, bitmaps: Map<String, Bitmap>) {
@@ -102,7 +103,8 @@ class DynamicWidget : GlanceAppWidget() {
                 val bmp = bitmaps[src]
                 val width = node.optInt("width", 50).dp
                 val height = node.optInt("height", 50).dp
-                val contentMode = if (node.optString("contentmode") == "fill") ContentScale.Crop else ContentScale.Fit
+                val modeString = node.optString("contentMode", "fit")
+                val contentMode = if (modeString == "fill") ContentScale.Crop else ContentScale.Fit
 
                 if (bmp != null) {
                     Image(
@@ -112,14 +114,12 @@ class DynamicWidget : GlanceAppWidget() {
                         modifier = GlanceModifier.size(width, height)
                     )
                 } else {
-                    // Fallback placeholder if the image fails to load
                     Spacer(modifier = GlanceModifier.size(width, height).background(Color.LightGray))
                 }
             }
         }
     }
 
-    // Standard HTTP connection to drop dependencies
     private suspend fun downloadBitmap(urlString: String): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {

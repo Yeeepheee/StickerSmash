@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LiveTimer from '@/modules/my-widget-library';
+import LiveTimer from '@/modules/countdown-activity';
 
 interface TimerProps {
   title: string;

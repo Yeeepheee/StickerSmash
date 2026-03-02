@@ -5,7 +5,8 @@ import { captureRef } from 'react-native-view-shot';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
 // Import your root App component
-import {WidgetEditor} from '@/modules/widget-builder'
+// import {WidgetEditor} from '@/modules/widget-builder'
+  import * as WidgetBuilder from '@/modules/widget-builder';
 
 import domtoimage from 'dom-to-image';
 import Button from '@/components/Button';
@@ -36,8 +37,41 @@ export default function Index() {
     shouldSetBadge: false,
     shouldShowBanner: true, 
     shouldShowList: true,
-  }),
-});
+    }),
+  });
+
+  const handleRefresh = async () => {
+    await WidgetBuilder.updateWidget({
+      layout: 'vstack',
+      backgroundColor: '#ffffff',
+      children: [
+        { 
+          type: 'text', 
+          value: 'Sticker Smash', 
+          fontSize: 20, 
+          color: '#000000',
+          alignment: 'center'
+        },
+        { 
+          type: 'image', 
+          src: 'https://reactnative.dev/img/tiny_logo.png', 
+          width: 40, 
+          height: 40 
+        },
+        { type: 'spacer' },
+        { 
+          type: 'text', 
+          value: `Last Sync: ${new Date().toLocaleTimeString()}`, 
+          fontSize: 12, 
+          color: '#000000' 
+        }
+      ]
+    });
+  };
+
+  useEffect(() => {
+    handleRefresh();
+  });
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
@@ -64,12 +98,6 @@ export default function Index() {
     const {x, y, width, height } = event.nativeEvent.layout;
     console.log("height: " + height + ", width: " + width + ", x: " + x + ", y: " + y);
     setContainerDimensions({x, y, width, height });
-  };
-  
-  const updateWidget = (localUri:any) => {
-    RNShared.setData("sharedImageUrl", localUri, (result:any) => {
-        console.log("Widget updated:", result);
-    });
   };
 
   const pickImageAsync = async () => {
@@ -110,7 +138,6 @@ export default function Index() {
         await MediaLibrary.saveToLibraryAsync(localUri);
         if (localUri) {
           alert('Saved!');
-          updateWidget(localUri); 
         }
       } catch (e) {
         console.log(e);
@@ -142,7 +169,7 @@ export default function Index() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <WidgetEditor/>
+      {/* <WidgetEditor/> */}
     <View style={styles.timerList}>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timerScroll}>
         <Timer title="Pizza" timerId="t1" initialSeconds={600} />
