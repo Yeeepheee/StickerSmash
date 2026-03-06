@@ -10,7 +10,7 @@ The module is accessed through a single TypeScript interface that handles the pl
 
 TypeScript
 
-```
+```typescript
 import CountdownTimer from 'expo-countdown-activity';
 
 // Start a timer
