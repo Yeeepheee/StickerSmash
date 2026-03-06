@@ -24,7 +24,7 @@ CountdownTimer.startLiveActivity(
 );
 
 // Stop a specific timer manually
-CountdownTimer.stopLiveActivity("order_123"); [cite: 1]
+CountdownTimer.stopLiveActivity("order_123");
 
 ```
 
