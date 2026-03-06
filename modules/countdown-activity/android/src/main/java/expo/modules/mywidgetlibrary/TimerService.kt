@@ -4,21 +4,25 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.graphics.drawable.Icon
 import android.os.*
 import androidx.core.app.NotificationCompat
-import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+
 
 class TimerService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val CHANNEL_ID = "timer_channel"
     
-    // Track the logic and the data needed to rebuild notifications
-    private val activeTrackers = ConcurrentHashMap<String, Runnable>()
-    private val timerData = ConcurrentHashMap<String, TimerDetails>()
+    // 1. WE COMBINED EVERYTHING INTO ONE OBJECT
+    data class TimerSession(
+        val endTime: Double, 
+        val title: String, 
+        val startTime: Long,
+        var runnable: Runnable? = null
+    )
 
-    data class TimerDetails(val endTime: Double, val title: String, val startTime: Long)
+    // 2. NOW WE ONLY NEED ONE MAP
+    private val activeTimers = ConcurrentHashMap<String, TimerSession>()
 
     companion object {
         const val ACTION_START = "ACTION_START"
@@ -35,7 +39,7 @@ class TimerService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Timer Service Channel",
-                NotificationManager.IMPORTANCE_LOW // Low priority prevents annoying sounds every update
+                NotificationManager.IMPORTANCE_LOW 
             ).apply {
                 description = "Used for active timers"
             }
@@ -43,36 +47,44 @@ class TimerService : Service() {
             manager.createNotificationChannel(channel)
         }
     }
-    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val timerId = intent?.getStringExtra("timerId") ?: return START_NOT_STICKY
-        
-        when (intent.action) {
-            ACTION_STOP -> stopIndividualTimer(timerId)
+        when (intent?.action) {
             ACTION_START -> {
-                val details = TimerDetails(
-                    endTime = intent.getDoubleExtra("endTime", 0.0),
-                    title = intent.getStringExtra("title") ?: "Timer",
-                    startTime = intent.getLongExtra("startTime", System.currentTimeMillis())
-                )
-                startTracking(timerId, details)
+                val timerId = intent.getStringExtra("timerId") ?: return START_NOT_STICKY
+                val endTime = intent.getDoubleExtra("endTime", 0.0)
+                val title = intent.getStringExtra("title") ?: "Timer"
+                val startTime = intent.getLongExtra("startTime", System.currentTimeMillis())
+                
+                val session = TimerSession(endTime, title, startTime)
+                startTracking(timerId, session)
+            }
+            ACTION_STOP -> {
+                val timerId = intent.getStringExtra("timerId")
+                if (timerId != null) {
+                    stopIndividualTimer(timerId)
+                }
             }
         }
         return START_STICKY
     }
 
-    private fun startTracking(timerId: String, details: TimerDetails) {
-        val notificationId = timerId.hashCode()
-        timerData[timerId] = details
+    private fun startTracking(timerId: String, session: TimerSession) {
+        // Ensure ID is strictly positive and never 0
+        val notificationId = (timerId.hashCode() and 0x7FFFFFFF).let { if (it == 0) 1 else it }
+        activeTimers[timerId] = session
 
         val runnable = object : Runnable {
             override fun run() {
                 val notification = buildTimerNotification(timerId)
                 val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                manager.notify(notificationId, notification)
+                
+                // Only notify if the notification was successfully built
+                if (notification != null) {
+                    manager.notify(notificationId, notification)
+                }
 
-                if (System.currentTimeMillis() < (timerData[timerId]?.endTime ?: 0.0)) {
+                if (System.currentTimeMillis() < (activeTimers[timerId]?.endTime ?: 0.0)) {
                     handler.postDelayed(this, 1000)
                 } else {
                     stopIndividualTimer(timerId)
@@ -80,87 +92,84 @@ class TimerService : Service() {
             }
         }
 
+        session.runnable = runnable
+
         // Only call startForeground if this is the first timer
-        if (activeTrackers.isEmpty()) {
-            val notification = buildTimerNotification(timerId)
+        if (activeTimers.size == 1) {
+            val notification = buildTimerNotification(timerId) ?: return
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                try {
+                    startForeground(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                } catch (e: Exception) {
+                    startForeground(notificationId, notification)
+                }
             } else {
                 startForeground(notificationId, notification)
             }
         }
 
-        activeTrackers[timerId] = runnable
-        handler.post(runnable)
+        // Delay the first tick so manager.notify doesn't instantly override startForeground
+        handler.postDelayed(runnable, 1000)
     }
 
     private fun stopIndividualTimer(timerId: String) {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationId = (timerId.hashCode() and 0x7FFFFFFF).let { if (it == 0) 1 else it }
         
-        activeTrackers[timerId]?.let { handler.removeCallbacks(it) }
-        activeTrackers.remove(timerId)
-        timerData.remove(timerId)
-        manager.cancel(timerId.hashCode())
+        activeTimers[timerId]?.runnable?.let { handler.removeCallbacks(it) }
+        activeTimers.remove(timerId)
+        manager.cancel(notificationId)
 
-        if (activeTrackers.isEmpty()) {
+        if (activeTimers.isEmpty()) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         } else {
-            // HANDOVER: Promote the next available timer to be the Foreground Anchor
-            val nextId = activeTrackers.keys.first()
-            val notification = buildTimerNotification(nextId)
+            // Promote the next available timer to be the Foreground Anchor
+            val nextId = activeTimers.keys.first()
+            val nextNotificationId = (nextId.hashCode() and 0x7FFFFFFF).let { if (it == 0) 1 else it }
+            val notification = buildTimerNotification(nextId) ?: return
+            
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(nextId.hashCode(), notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                try {
+                    startForeground(nextNotificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                } catch (e: Exception) {
+                    startForeground(nextNotificationId, notification)
+                }
             } else {
-                startForeground(nextId.hashCode(), notification)
+                startForeground(nextNotificationId, notification)
             }
         }
     }
 
-    private fun buildTimerNotification(timerId: String): Notification {
-        val data = timerData[timerId] ?: return Notification()
-        val progress = (((System.currentTimeMillis() - data.startTime).toDouble() / (data.endTime - data.startTime)) * 100).toInt().coerceIn(0, 100)
+    private fun buildTimerNotification(timerId: String): Notification? {
+        val data = activeTimers[timerId] ?: return null
+        
+        val totalDuration = maxOf(data.endTime - data.startTime, 1.0)
+        val elapsed = System.currentTimeMillis() - data.startTime
+        val progress = ((elapsed.toDouble() / totalDuration) * 100).toInt().coerceIn(0, 100)
 
-        val stopIntent = Intent(this, TimerService::class.java).apply {
-            action = ACTION_STOP
-            putExtra("timerId", timerId)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(applicationInfo.icon)
+            .setContentTitle(data.title)
+            .setOngoing(true)
+            .setProgress(100, progress, false)
+            .setWhen(data.endTime.toLong())
+            .setUsesChronometer(true)
+            .setChronometerCountDown(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
         }
-        val pendingStopIntent = PendingIntent.getService(
-            this, timerId.hashCode(), stopIntent, 
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 
-        return if (Build.VERSION.SDK_INT >= 36) {
-            val progressStyle = Notification.ProgressStyle()
-                .setProgress(progress)
-
-            Notification.Builder(this, CHANNEL_ID)
-                .setSmallIcon(applicationInfo.icon)
-                .setContentTitle(data.title)
-                .setOngoing(true)
-                .setStyle(progressStyle)
-                .setWhen(data.endTime.toLong())
-                .setShowWhen(true)
-                .setUsesChronometer(true)
-                .setChronometerCountDown(true)
-                .apply { extras.putBoolean("android.requestPromotedOngoing", true) }
-                .build()
-        } else {
-            NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(applicationInfo.icon)
-                .setContentTitle(data.title)
-                .setOngoing(true)
-                .setProgress(100, progress, false)
-                .setWhen(data.endTime.toLong())
-                .setUsesChronometer(true)
-                .setChronometerCountDown(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
-        }
+        return builder.build()
     }
 
+    override fun onBind(intent: Intent?): IBinder? = null
+
     override fun onDestroy() {
-        activeTrackers.values.forEach { handler.removeCallbacks(it) }
+        activeTimers.values.forEach { it.runnable?.let { run -> handler.removeCallbacks(run) } }
+        activeTimers.clear()
         super.onDestroy()
     }
 }
