@@ -6,9 +6,8 @@ public class WidgetBridge: Module {
     Name("WidgetBridge")
 
     AsyncFunction("saveWidgetSchema") { (json: String) in
-      let defaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
+      let defaults = UserDefaults(suiteName: WidgetConfig.appGroupId)
       defaults?.set(json, forKey: "widgetSchema")
-      
       WidgetCenter.shared.reloadAllTimelines()
     }
   }

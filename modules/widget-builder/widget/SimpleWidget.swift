@@ -26,16 +26,16 @@ struct SimpleWidgetProvider: TimelineProvider {
             NSLog("⚠️ WIDGET: loadConfig() returned nil. Check App Groups/JSON.")
         }
         let dispatchGroup = DispatchGroup()
-        let sharedDefaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
+        let sharedDefaults = UserDefaults(suiteName: WidgetConfig.appGroupId)
         
         var remoteOverrides: [String: NodeOverride] = [:]
 
-        // 1. Fetch Remote Data Dictionary
+        // Fetch Remote Data Dictionary
         if let remoteUrlString = config?.remoteConfigUrl, let url = URL(string: remoteUrlString) {
             NSLog("🌐 WIDGET: Fetching remote data from \(remoteUrlString)")
             dispatchGroup.enter()
             
-            // --- FIX: Create a request and force it to bypass the local cache ---
+            
             var request = URLRequest(url: url)
             request.cachePolicy = .reloadIgnoringLocalCacheData
             
@@ -67,7 +67,7 @@ struct SimpleWidgetProvider: TimelineProvider {
             var downloadedImages: [String: Data] = [:]
             var imageUrls = Set<String>()
             
-            // 2. Extract image URLs recursively (considering Overrides)
+            // Extract image URLs recursively (considering Overrides)
             if let config = config {
                 self.extractUrls(from: config.small.children, overrides: remoteOverrides, into: &imageUrls)
                 if let med = config.medium { self.extractUrls(from: med.children, overrides: remoteOverrides, into: &imageUrls) }
@@ -75,9 +75,9 @@ struct SimpleWidgetProvider: TimelineProvider {
             }
             
             let downloadGroup = DispatchGroup()
-            let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.luminous5972.StickerSmash")
+            let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: WidgetConfig.appGroupId)   
 
-            // 3. Download or load images
+            // Download or load images
             for urlString in imageUrls {
                 downloadGroup.enter()
                 if urlString.hasPrefix("http://") || urlString.hasPrefix("https://") {
@@ -126,7 +126,7 @@ struct SimpleWidgetProvider: TimelineProvider {
     }
     
     private func loadConfig() -> MultiSizeWidgetConfig? {
-        let defaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
+        let defaults = UserDefaults(suiteName: WidgetConfig.appGroupId)
         guard let json = defaults?.string(forKey: "widgetSchema"),
               let data = json.data(using: .utf8) else { 
             NSLog("Widget Error: No JSON found in UserDefaults")
@@ -136,7 +136,7 @@ struct SimpleWidgetProvider: TimelineProvider {
         do {
             return try JSONDecoder().decode(MultiSizeWidgetConfig.self, from: data)
         } catch {
-            // This will tell you EXACTLY what is failing if your JSON format mismatches!
+            
             NSLog("Widget Decoding Error: \(error)")
             return nil
         }

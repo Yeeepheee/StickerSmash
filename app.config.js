@@ -45,6 +45,9 @@ export default {
       favicon: "./assets/images/favicon.png"
     },
     plugins: [
+      ["./modules/widget-builder/plugins/withWidgetExtension", {
+        appGroupId: `group.${process.env.BUNDLE_ID ?? "com.luminous5972.StickerSmash"}`
+      }],
       "expo-router",
       ["expo-splash-screen", {
         image: "./assets/images/splash-icon.png",

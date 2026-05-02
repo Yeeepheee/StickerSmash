@@ -4,7 +4,7 @@ struct WidgetRenderer: View {
     @Environment(\.widgetContentMargins) var margins
     let schema: WidgetSchema
     let images: [String: Data]
-    let remoteData: [String: NodeOverride] // Added
+    let remoteData: [String: NodeOverride] 
     var isRoot: Bool = false
 
     var body: some View {

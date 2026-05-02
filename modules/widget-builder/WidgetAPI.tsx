@@ -10,7 +10,7 @@ export type OverlayAlignment =
   | 'bottomLeading' | 'bottomCenter' | 'bottomTrailing';
 
 export interface WidgetText {
-  id?: string; // <-- ADDED: Identifier for remote data binding
+  id?: string; 
   type: 'text';
   value: string;
   fontSize?: number;
@@ -21,8 +21,7 @@ export interface WidgetText {
 }
 
 export interface WidgetImage {
-  id?: string; // <-- ADDED: Identifier for remote data binding
-  type: 'image';
+  id?: string; 
   src: string;
   width?: number;
   height?: number;
@@ -37,7 +36,7 @@ export interface WidgetSpacer {
 }
 
 export interface WidgetContainer extends WidgetConfig {
-  id?: string; // <-- ADDED: Identifier for remote data binding (e.g. override background colors)
+  id?: string; 
   type: 'container';
   alignment?: OverlayAlignment;
   link?: string;
@@ -55,7 +54,7 @@ export interface MultiSizeWidgetConfig {
   small: WidgetConfig;   
   medium?: WidgetConfig; 
   large?: WidgetConfig;  
-  remoteConfigUrl?: string; // URL now points to a Key-Value dictionary instead of a layout schema
+  remoteConfigUrl?: string; 
 }
 
 function normalizeElements(elements: WidgetElement[]): WidgetElement[] {
