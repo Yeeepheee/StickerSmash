@@ -1,0 +1,64 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env.*
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# EAS
+eas-credentials.json
+
+# typescript
+*.tsbuildinfo
+
+app-example
+private
+
+# Android build artifacts
+modules/**/android/build/
+modules/**/android/.gradle/
+modules/**/android/local.properties
+
+# IDE
+.idea/
+*.iml
+**/.idea/
+
+# Widget builder android idea files
+modules/widget-builder/android/.idea/
+
+
+# generated native folders
+/ios
+/android
