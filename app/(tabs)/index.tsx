@@ -174,7 +174,7 @@ export default function Index() {
 
   const handleRefresh = async () => {
     await WidgetBuilder.updateMultiSizeWidget({
-      remoteConfigUrl: 'http://192.168.1.183:8080/widget.json',
+      remoteConfigUrl: 'http://192.168.1.100:8080/widget.json',
       small: {
         layout: 'zstack',
         backgroundColor: '#0F172A',

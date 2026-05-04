@@ -22,68 +22,60 @@ struct SimpleWidgetProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleWidgetEntry>) -> Void) {
         NSLog("🔄 WIDGET: getTimeline called by system")
         let config = loadConfig()
-        if config == nil {
-            NSLog("⚠️ WIDGET: loadConfig() returned nil. Check App Groups/JSON.")
-        }
-        let dispatchGroup = DispatchGroup()
         let sharedDefaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
-        
         var remoteOverrides: [String: NodeOverride] = [:]
 
-        // 1. Fetch Remote Data Dictionary
-        if let remoteUrlString = config?.remoteConfigUrl, let url = URL(string: remoteUrlString) {
-            NSLog("🌐 WIDGET: Fetching remote data from \(remoteUrlString)")
+        let dispatchGroup = DispatchGroup()
+
+        
+        if let cachedData = sharedDefaults?.data(forKey: "widget_remote_data"),
+        let decoded = try? JSONDecoder().decode([String: NodeOverride].self, from: cachedData) {
+            remoteOverrides = decoded
+            NSLog("✅ WIDGET: Loaded cached remote data")
+        }
+
+        
+        if let urlString = config?.remoteConfigUrl, let url = URL(string: urlString) {
+            NSLog("🌐 WIDGET: Fetching fresh remote data")
             dispatchGroup.enter()
-            
-            // --- FIX: Create a request and force it to bypass the local cache ---
             var request = URLRequest(url: url)
             request.cachePolicy = .reloadIgnoringLocalCacheData
-            
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    NSLog("❌ WIDGET Network Error: \(error.localizedDescription)")
-                } else if let data = data {
-                    NSLog("📥 WIDGET Data: %@", String(data: data, encoding: .utf8) ?? "📥 Could not convert to string")
-                    
-                    // Cache it for offline/push reloads
+            URLSession.shared.dataTask(with: request) { data, _, error in
+                if let data = data {
                     sharedDefaults?.set(data, forKey: "widget_remote_data")
-                    
                     if let decoded = try? JSONDecoder().decode([String: NodeOverride].self, from: data) {
                         remoteOverrides = decoded
+                        NSLog("✅ WIDGET: Updated with fresh remote data")
                     }
+                } else if let error = error {
+                    NSLog("⚠️ WIDGET: Fresh fetch failed, using cache: \(error.localizedDescription)")
                 }
                 dispatchGroup.leave()
             }.resume()
         }
 
         dispatchGroup.notify(queue: .main) {
-            // Read from cache if network failed
-            if remoteOverrides.isEmpty,
-               let cachedData = sharedDefaults?.data(forKey: "widget_remote_data"),
-               let decoded = try? JSONDecoder().decode([String: NodeOverride].self, from: cachedData) {
-                remoteOverrides = decoded
-            }
-            
             var downloadedImages: [String: Data] = [:]
             var imageUrls = Set<String>()
+
             
-            // 2. Extract image URLs recursively (considering Overrides)
             if let config = config {
                 self.extractUrls(from: config.small.children, overrides: remoteOverrides, into: &imageUrls)
                 if let med = config.medium { self.extractUrls(from: med.children, overrides: remoteOverrides, into: &imageUrls) }
                 if let lrg = config.large { self.extractUrls(from: lrg.children, overrides: remoteOverrides, into: &imageUrls) }
             }
-            
+
             let downloadGroup = DispatchGroup()
             let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.luminous5972.StickerSmash")
 
-            // 3. Download or load images
+            
             for urlString in imageUrls {
                 downloadGroup.enter()
                 if urlString.hasPrefix("http://") || urlString.hasPrefix("https://") {
                     if let url = URL(string: urlString) {
                         var request = URLRequest(url: url)
                         request.setValue("DynamicWidgetApp/1.0 (iOS)", forHTTPHeaderField: "User-Agent")
+                        request.timeoutInterval = 3.0
                         URLSession.shared.dataTask(with: request) { data, _, _ in
                             if let data = data { downloadedImages[urlString] = data }
                             downloadGroup.leave()
@@ -92,19 +84,18 @@ struct SimpleWidgetProvider: TimelineProvider {
                 } else if urlString.hasPrefix("shared://") {
                     let filename = String(urlString.dropFirst("shared://".count))
                     if let fileUrl = sharedContainer?.appendingPathComponent(filename),
-                       let data = try? Data(contentsOf: fileUrl) { downloadedImages[urlString] = data }
+                    let data = try? Data(contentsOf: fileUrl) { downloadedImages[urlString] = data }
                     downloadGroup.leave()
                 } else {
                     downloadGroup.leave()
                 }
             }
-            
+
             downloadGroup.notify(queue: .main) {
-                NSLog("🏁 WIDGET: Data fetching complete. Finalizing timeline...")
+                NSLog("🏁 WIDGET: Timeline finalizing...")
                 let entry = SimpleWidgetEntry(date: Date(), config: config, images: downloadedImages, remoteData: remoteOverrides)
-                let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())!
+                let nextUpdate = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!
                 let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-                NSLog("✅ WIDGET: Timeline completion handler called.")
                 completion(timeline)
             }
         }
@@ -164,9 +155,6 @@ struct SimpleWidgetEntryView: View {
         }
     }
 }
-
-import WidgetKit
-import SwiftUI
 
 struct SimpleWidget: Widget {
     let kind: String = "SimpleWidget"
