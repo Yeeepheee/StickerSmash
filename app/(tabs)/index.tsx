@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
-import * as WidgetBuilder from '@/modules/widget-builder';
 
 import domtoimage from 'dom-to-image';
 import Button from '@/components/Button';
@@ -16,7 +15,8 @@ import EmojiList from '@/components/EmojiList';
 import EmojiSticker from '@/components/EmojiSticker';
 import Timer from '@/components/Timer';
 import * as Notifications from 'expo-notifications';
-
+import {WeatherWidget} from '@/components/WeatherWidget';
+import {NewsWidget} from '@/components/NewsWidget';
 
 const PlaceholderImage = require('@/assets/images/background-image.png');
 const RNShared = NativeModules.RNShared;
@@ -53,218 +53,9 @@ export default function Index() {
     getToken();
   }, []); // Runs once when the component loads
 
-  const NEWS_IMAGE = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400';
-  const LOGO_ICON = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400';
-
-  // const handleRefresh = async () => {
-  //   await WidgetBuilder.updateMultiSizeWidget({
-  //     small: {
-  //       layout: 'zstack',
-  //       backgroundColor: '#000000',
-  //       children: [
-  //         { type: 'image', src: NEWS_IMAGE, contentMode: 'fill', isBackground: true },
-  //         { type: 'image', src: LOGO_ICON, width: 40, height: 40, alignment: 'topTrailing' },
-  //         { type: 'text', value: 'MacBook Pro\nSupercharged by M3', fontSize: 14, color: '#ffffff', textAlignment: 'leading', alignment: 'bottomLeading' }
-  //       ]
-  //     },
-
-  //     // MEDIUM: Larger images and a dedicated "TECH" header
-  //     medium: {
-  //       layout: 'vstack',
-  //       backgroundColor: '#ffffff',
-  //       children: [
-  //         // --- APPLE NEWS STYLE HEADER ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' }, // Apple Red style label
-  //             { type: 'spacer' },
-  //             { type: 'image', src: LOGO_ICON, width: 18, height: 18 }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 1 (Larger Image Size) ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 15, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 40, height: 40, contentMode: 'fill' }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 2 ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'The future of Mac gaming is here', fontSize: 15, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 40, height: 40, contentMode: 'fill' }
-  //           ]
-  //         }
-  //       ]
-  //     },
-
-  //     // LARGE: 4 News Items with the same TECH header
-  //     large: {
-  //       layout: 'vstack',
-  //       backgroundColor: '#ffffff',
-  //       children: [
-  //         // --- APPLE NEWS STYLE HEADER ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: LOGO_ICON, width: 18, height: 18 }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 1 ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 13, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 2 ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'The future of Mac gaming is here', fontSize: 13, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 3 ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'How to choose your next MacBook', fontSize: 13, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
-  //           ]
-  //         },
-  //         { type: 'spacer' },
-  //         // --- ROW 4 ---
-  //         {
-  //           type: 'container',
-  //           layout: 'hstack',
-  //           children: [
-  //             { type: 'text', value: 'MacOS Sonoma: Tips and Tricks', fontSize: 13, color: '#1a1a1a' },
-  //             { type: 'spacer' },
-  //             { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
-  //           ]
-  //         }
-  //       ]
-  //     }
-  //   });
-  // };
-
-  const handleRefresh = async () => {
-    await WidgetBuilder.updateMultiSizeWidget({
-      remoteConfigUrl: 'http://192.168.1.100:8080/widget.json',
-      small: {
-        layout: 'zstack',
-        backgroundColor: '#0F172A',
-        children: [
-          {
-            type: 'container',
-            layout: 'vstack',
-            alignment: 'center',
-            children: [
-              { id: 'current_temp', type: 'text', value: '72°', fontSize: 32, color: '#FFFFFF' },
-              { id: 'current_condition', type: 'text', value: 'Sunny', fontSize: 14, color: '#CBD5E1' }
-            ]
-          }
-        ]
-      },
-
-      medium: {
-        layout: 'hstack',
-        backgroundColor: '#1E293B',
-        children: [
-          {
-            type: 'container',
-            layout: 'vstack',
-            alignment: 'centerLeading',
-            children: [
-              { id: 'city_name', type: 'text', value: 'San Francisco', fontSize: 18, color: '#FFFFFF' },
-              { id: 'last_updated_date', type: 'text', value: 'Monday, Oct 23', fontSize: 12, color: '#94A3B8' }
-            ]
-          },
-          { type: 'spacer' },
-          {
-            type: 'container',
-            layout: 'hstack',
-            children: [
-              {
-                id: 'weather_icon_url',
-                type: 'image',
-                src: 'https://cdn-icons-png.flaticon.com/512/869/869869.png',
-                width: 40,
-                height: 40
-              },
-              { id: 'current_temp', type: 'text', value: '72°', fontSize: 28, color: '#FFFFFF' }
-            ]
-          }
-        ]
-      },
-
-      large: {
-        layout: 'vstack',
-        backgroundColor: '#F8FAFC',
-        children: [
-          { type: 'text', value: 'Weekly Forecast', fontSize: 20, color: '#1E293B', alignment: 'topLeading' },
-          { type: 'spacer' },
-          {
-            type: 'container',
-            layout: 'hstack',
-            backgroundColor: '#FFFFFF',
-            children: [
-              { id: 'f1_day', type: 'text', value: 'Tue', color: '#64748B' },
-              { type: 'spacer' },
-              { id: 'f1_temp', type: 'text', value: '75° / 60°', color: '#0F172A' }
-            ]
-          },
-          {
-            type: 'container',
-            layout: 'hstack',
-            backgroundColor: '#FFFFFF',
-            children: [
-              { id: 'f2_day', type: 'text', value: 'Wed', color: '#64748B' },
-              { type: 'spacer' },
-              { id: 'f2_temp', type: 'text', value: '68° / 55°', color: '#0F172A' }
-            ]
-          },
-          { type: 'spacer' },
-          {
-            id: 'footer_update_text',
-            type: 'text',
-            value: 'Updated 2m ago',
-            fontSize: 10,
-            color: '#94A3B8',
-            alignment: 'bottomCenter'
-          }
-        ]
-      }
-    });
-
-  };
-
   useEffect(() => {
-    handleRefresh();
+    // NewsWidget();
+    WeatherWidget();
   });
 
   useEffect(() => {
