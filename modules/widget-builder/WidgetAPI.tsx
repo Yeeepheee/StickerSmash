@@ -10,18 +10,18 @@ export type OverlayAlignment =
   | 'bottomLeading' | 'bottomCenter' | 'bottomTrailing';
 
 export interface WidgetText {
-  id?: string; 
+  id?: string;
   type: 'text';
   value: string;
   fontSize?: number;
   color?: ColorHex;
   textAlignment?: 'center' | 'leading' | 'trailing';
   alignment?: OverlayAlignment;
-  link?: string; 
+  link?: string;
 }
 
 export interface WidgetImage {
-  id?: string; 
+  id?: string;
   type: 'image';
   src: string;
   width?: number;
@@ -37,7 +37,7 @@ export interface WidgetSpacer {
 }
 
 export interface WidgetContainer extends WidgetConfig {
-  id?: string; 
+  id?: string;
   type: 'container';
   alignment?: OverlayAlignment;
   link?: string;
@@ -52,10 +52,11 @@ export interface WidgetConfig {
 }
 
 export interface MultiSizeWidgetConfig {
-  small: WidgetConfig;   
-  medium?: WidgetConfig; 
-  large?: WidgetConfig;  
-  remoteConfigUrl?: string; 
+  widgetId: string;        // e.g. "slot1", "slot2"
+  small: WidgetConfig;
+  medium?: WidgetConfig;
+  large?: WidgetConfig;
+  remoteConfigUrl?: string;
 }
 
 function normalizeElements(elements: WidgetElement[]): WidgetElement[] {
@@ -81,17 +82,19 @@ function normalizeElements(elements: WidgetElement[]): WidgetElement[] {
 
 export async function updateMultiSizeWidget(config: MultiSizeWidgetConfig): Promise<void> {
   try {
+    const { widgetId, ...schema } = config;
+
     const finalConfig = {
-      small: { ...config.small, children: normalizeElements(config.small.children) },
-      medium: config.medium ? { ...config.medium, children: normalizeElements(config.medium.children) } : undefined,
-      large: config.large ? { ...config.large, children: normalizeElements(config.large.children) } : undefined,
-      remoteConfigUrl: config.remoteConfigUrl
+      small: { ...schema.small, children: normalizeElements(schema.small.children) },
+      medium: schema.medium ? { ...schema.medium, children: normalizeElements(schema.medium.children) } : undefined,
+      large: schema.large ? { ...schema.large, children: normalizeElements(schema.large.children) } : undefined,
+      remoteConfigUrl: schema.remoteConfigUrl
     };
 
     const jsonString = JSON.stringify(finalConfig);
-    return await WidgetBridge.saveWidgetSchema(jsonString);
+    return await WidgetBridge.saveWidgetSchema(jsonString, widgetId);
   } catch (error) {
-    console.error("Widget Update Failed:", error);
+    console.error(`Widget Update Failed [${config.widgetId}]:`, error);
     throw error;
   }
 }

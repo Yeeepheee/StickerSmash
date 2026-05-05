@@ -4,7 +4,8 @@ import SwiftUI
 @main
 struct exportWidgets: WidgetBundle {
     var body: some Widget {
-        SimpleWidget()
+        Slot0Widget()
+        Slot1Widget()
         TimerWidgetLiveActivity()
     }
 }

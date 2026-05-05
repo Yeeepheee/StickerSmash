@@ -1,6 +1,3 @@
-// 1. INITIALIZE BUILDSCRIPT 
-// This block evaluates first. If the host project is Kotlin 2.0+, we inject 
-// the new Compose Compiler plugin into the classpath so it can be applied later.
 buildscript {
     def hostKotlinVersion = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : "1.9.23"
     if (hostKotlinVersion.startsWith("2.")) {
@@ -16,11 +13,9 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-// 2. CHECK VERSION IN MAIN SCRIPT SCOPE
 def hostKotlinVersion = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : "1.9.23"
 def isKotlin2 = hostKotlinVersion.startsWith("2.")
 
-// 3. DYNAMICALLY APPLY THE PLUGIN (Kotlin 2.0+ Only)
 if (isKotlin2) {
     apply plugin: "org.jetbrains.kotlin.plugin.compose"
 }
@@ -74,6 +69,7 @@ android {
 }
 
 dependencies {
+  implementation "androidx.glance:glance:1.1.0"
   implementation "androidx.glance:glance-appwidget:1.1.0"
   implementation "androidx.glance:glance-material3:1.1.0"
   implementation("io.coil-kt:coil:2.6.0") 

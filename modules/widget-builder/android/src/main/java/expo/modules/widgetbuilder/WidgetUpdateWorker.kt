@@ -16,18 +16,35 @@ class WidgetUpdateWorker(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             val prefs = applicationContext.getSharedPreferences("WIDGET_PREFS", Context.MODE_PRIVATE)
-            val jsonString = prefs.getString("widget_schema", "{}") ?: "{}"
-            val schemaRoot = JSONObject(jsonString)
-            val remoteUrl = schemaRoot.optString("remoteConfigUrl", "")
 
-            if (remoteUrl.isNotEmpty()) {
+            
+            val targetWidgetIds = inputData.getString("widgetId")
+                ?.let { listOf(it) }
+                ?: SlotRegistry.getAllAssigned(applicationContext).keys.toList()
 
-                val responseText = java.net.URL(remoteUrl).readText()
+            for (widgetId in targetWidgetIds) {
+                val jsonString = prefs.getString("widget_schema_$widgetId", "{}") ?: "{}"
+                val remoteUrl  = JSONObject(jsonString).optString("remoteConfigUrl", "")
+
+                if (remoteUrl.isNotEmpty()) {
+                    try {
+                        val connection = java.net.URL(remoteUrl).openConnection() as java.net.HttpURLConnection
+                        connection.connectTimeout = 5_000
+                        connection.readTimeout = 5_000
+                        val responseText = connection.inputStream.bufferedReader().readText()
+                        prefs.edit().putString("widget_remote_data_$widgetId", responseText).commit()
+                        android.util.Log.d("WIDGET_WORKER", "Remote data updated for $widgetId")
+                    } catch (e: Exception) {
+                        android.util.Log.w("WIDGET_WORKER", "Remote fetch failed for $widgetId: ${e.message}")
+                    }
+                }
+
                 
-                prefs.edit().putString("widget_remote_data", responseText).commit()
-                
-                DynamicWidget().updateAll(applicationContext)
+                val index  = SlotRegistry.getSlotIndex(applicationContext, widgetId) ?: continue
+                val widget = SlotRegistry.getWidget(index) ?: continue
+                widget.updateAll(applicationContext)
             }
+
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()

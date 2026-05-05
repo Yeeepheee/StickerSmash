@@ -42,7 +42,6 @@ export default function Index() {
   useEffect(() => {
     async function getToken() {
       try {
-        // 1. Get the token inside this async function
         const token = (await Notifications.getDevicePushTokenAsync()).data;
         console.log("FCM Token:", token);
       } catch (error) {
@@ -51,10 +50,10 @@ export default function Index() {
     }
 
     getToken();
-  }, []); // Runs once when the component loads
+  }, []);
 
   useEffect(() => {
-    // NewsWidget();
+    NewsWidget();
     WeatherWidget();
   });
 

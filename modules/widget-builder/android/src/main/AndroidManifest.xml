@@ -1,22 +1,54 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="expo.modules.widgetbuilder"> 
+    package="expo.modules.widgetbuilder">
     <application>
-        <receiver android:name=".DynamicWidgetReceiver" android:exported="true">
+
+        <receiver android:name=".Slot0WidgetReceiver" android:exported="true" android:enabled="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
                 <action android:name="com.luminous5972.UPDATE_WIDGET"/>
             </intent-filter>
-            <meta-data 
-                android:name="android.appwidget.provider" 
-                android:resource="@xml/dynamic_widget_info"/>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/slot0_widget_info"/>
+        </receiver>
+
+        <receiver android:name=".Slot1WidgetReceiver" android:exported="true" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.luminous5972.UPDATE_WIDGET"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/slot1_widget_info"/>
+        </receiver>
+
+        <receiver android:name=".Slot2WidgetReceiver" android:exported="true" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.luminous5972.UPDATE_WIDGET"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/slot2_widget_info"/>
+        </receiver>
+
+        <receiver android:name=".Slot3WidgetReceiver" android:exported="true" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.luminous5972.UPDATE_WIDGET"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/slot3_widget_info"/>
+        </receiver>
+
+        <receiver android:name=".Slot4WidgetReceiver" android:exported="true" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.luminous5972.UPDATE_WIDGET"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/slot4_widget_info"/>
         </receiver>
 
         <service
             android:name=".WidgetMessagingService"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+
     </application>
 </manifest>

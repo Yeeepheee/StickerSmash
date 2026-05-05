@@ -1,18 +1,41 @@
 import { updateMultiSizeWidget } from '@/modules/widget-builder';
 
-
 export async function NewsWidget() {
-  const NEWS_IMAGE = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400';
-  const LOGO_ICON = 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400';
+  const ABOUT_LINK = 'stickersmash:///about';
+
   await updateMultiSizeWidget({
-    // widgetId: 'slot1',
+    widgetId: 'slot0',
+    remoteConfigUrl: 'http://192.168.1.100:8080/Widget/News.json',
+    
     small: {
       layout: 'zstack',
       backgroundColor: '#000000',
       children: [
-        { type: 'image', src: NEWS_IMAGE, contentMode: 'fill', isBackground: true },
-        { type: 'image', src: LOGO_ICON, width: 40, height: 40, alignment: 'topTrailing' },
-        { type: 'text', value: 'MacBook Pro\nSupercharged by M3', fontSize: 14, color: '#ffffff', textAlignment: 'leading', alignment: 'bottomLeading' }
+        { 
+          id: 'news_hero_image', 
+          type: 'image', 
+          link: ABOUT_LINK, 
+          src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', 
+          contentMode: 'fill', 
+          isBackground: true 
+        },
+        { 
+          id: 'news_logo', 
+          type: 'image', 
+          src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', 
+          width: 40, 
+          height: 40, 
+          alignment: 'topTrailing' 
+        },
+        { 
+          id: 'news_headline_small', 
+          type: 'text', 
+          value: 'MacBook Pro\nSupercharged by M3', 
+          fontSize: 14, 
+          color: '#ffffff', 
+          textAlignment: 'leading', 
+          alignment: 'bottomLeading' 
+        }
       ]
     },
 
@@ -24,31 +47,31 @@ export async function NewsWidget() {
           type: 'container',
           layout: 'hstack',
           children: [
-            { type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' }, 
+            { id: 'news_category', type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' }, 
             { type: 'spacer' },
-            { type: 'image', src: LOGO_ICON, width: 18, height: 18 }
+            { id: 'news_logo', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 18, height: 18 }
           ]
         },
         { type: 'spacer' },
-
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 15, color: '#1a1a1a' },
+            { id: 'news_title_1', type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 15, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 40, height: 40, contentMode: 'fill' }
+            { id: 'news_image_1', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 40, height: 40, contentMode: 'fill' }
           ]
         },
         { type: 'spacer' },
-
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'The future of Mac gaming is here', fontSize: 15, color: '#1a1a1a' },
+            { id: 'news_title_2', type: 'text', value: 'The future of Mac gaming is here', fontSize: 15, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 40, height: 40, contentMode: 'fill' }
+            { id: 'news_image_2', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 40, height: 40, contentMode: 'fill' }
           ]
         }
       ]
@@ -62,57 +85,56 @@ export async function NewsWidget() {
           type: 'container',
           layout: 'hstack',
           children: [
-            { type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' },
+            { id: 'news_category', type: 'text', value: 'TECH', fontSize: 11, color: '#ff3b30' },
             { type: 'spacer' },
-            { type: 'image', src: LOGO_ICON, width: 18, height: 18 }
+            { id: 'news_logo', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 18, height: 18 }
           ]
         },
         { type: 'spacer' },
-        
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 13, color: '#1a1a1a' },
+            { id: 'news_title_1', type: 'text', value: 'Apple unveils the new M3 chip family', fontSize: 13, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
+            { id: 'news_image_1', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 50, height: 50, contentMode: 'fill' }
           ]
         },
         { type: 'spacer' },
-        
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'The future of Mac gaming is here', fontSize: 13, color: '#1a1a1a' },
+            { id: 'news_title_2', type: 'text', value: 'The future of Mac gaming is here', fontSize: 13, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
+            { id: 'news_image_2', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 50, height: 50, contentMode: 'fill' }
           ]
         },
         { type: 'spacer' },
-        
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'How to choose your next MacBook', fontSize: 13, color: '#1a1a1a' },
+            { id: 'news_title_3', type: 'text', value: 'How to choose your next MacBook', fontSize: 13, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
+            { id: 'news_image_3', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 50, height: 50, contentMode: 'fill' }
           ]
         },
         { type: 'spacer' },
-        
         {
           type: 'container',
           layout: 'hstack',
+          link: ABOUT_LINK,
           children: [
-            { type: 'text', value: 'MacOS Sonoma: Tips and Tricks', fontSize: 13, color: '#1a1a1a' },
+            { id: 'news_title_4', type: 'text', value: 'MacOS Sonoma: Tips and Tricks', fontSize: 13, color: '#1a1a1a' },
             { type: 'spacer' },
-            { type: 'image', src: NEWS_IMAGE, width: 50, height: 50, contentMode: 'fill' }
+            { id: 'news_image_4', type: 'image', src: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=400', width: 50, height: 50, contentMode: 'fill' }
           ]
         }
       ]
     }
   });
-
 }

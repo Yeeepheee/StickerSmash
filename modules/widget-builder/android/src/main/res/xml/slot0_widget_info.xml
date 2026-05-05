@@ -5,8 +5,7 @@
     android:targetCellWidth="2"
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/dynamic_widget"
-    android:previewLayout="@layout/dynamic_widget"
+    android:initialLayout="@layout/widget_preview_root"
+    android:previewLayout="@layout/widget_preview_root"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen">
-</appwidget-provider>
+    android:widgetCategory="home_screen"/>

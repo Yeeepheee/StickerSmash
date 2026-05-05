@@ -3,8 +3,8 @@ import { updateMultiSizeWidget } from '@/modules/widget-builder';
 export async function WeatherWidget() {
 
     await updateMultiSizeWidget({
-        // widgetId: 'slot2',
-        remoteConfigUrl: 'http://192.168.1.100:8080/widget.json',
+        widgetId: 'slot1',
+        remoteConfigUrl: 'http://192.168.1.100:8080/Widget/Weather.json',
         small: {
             layout: 'zstack',
             backgroundColor: '#0F172A',
