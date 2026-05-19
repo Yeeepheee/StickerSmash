@@ -8,6 +8,7 @@ import android.widget.RemoteViews
 import androidx.glance.appwidget.updateAll
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import expo.modules.kotlin.modules.Module
@@ -22,6 +23,23 @@ import java.util.concurrent.TimeUnit
 class WidgetBridge : Module() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    companion object {
+        @JvmStatic
+        fun handlePushData(context: Context, data: Map<String, String>) {
+            if (data["action"] != "UPDATE_WIDGET") return
+
+            val targetSlot = data["widgetId"]
+            val inputData  = if (targetSlot != null)
+                Data.Builder().putString("widgetId", targetSlot).build()
+            else Data.EMPTY
+
+            WorkManager.getInstance(context)
+                .enqueue(OneTimeWorkRequestBuilder<WidgetUpdateWorker>()
+                    .setInputData(inputData)
+                    .build())
+        }
+    }
 
     override fun definition() = ModuleDefinition {
         Name("WidgetBridge")
@@ -63,8 +81,45 @@ class WidgetBridge : Module() {
             }
         }
 
-        OnDestroy {
-            scope.cancel()
+        AsyncFunction("writeWidgetData") { data: Map<String, Any>, widgetId: String ->
+            val context = appContext.reactContext ?: throw Exception("React context not available")
+
+            try {
+                val prefs = context.getSharedPreferences("WIDGET_PREFS", Context.MODE_PRIVATE)
+
+                val existing    = prefs.getString("widget_remote_data_$widgetId", "{}") ?: "{}"
+                val existingObj = org.json.JSONObject(existing)
+
+                for ((key, value) in data) {
+                    @Suppress("UNCHECKED_CAST")
+                    val nodeMap = value as? Map<String, Any> ?: continue
+                    val nodeObj = org.json.JSONObject()
+                    for ((k, v) in nodeMap) {
+                        when (v) {
+                            is Boolean -> nodeObj.put(k, v)
+                            is Int     -> nodeObj.put(k, v)
+                            is Double  -> nodeObj.put(k, v)
+                            is Float   -> nodeObj.put(k, v.toDouble())
+                            is Long    -> nodeObj.put(k, v)
+                            else       -> nodeObj.put(k, v.toString())
+                        }
+                    }
+                    existingObj.put(key, nodeObj)
+                }
+
+                prefs.edit().putString("widget_remote_data_$widgetId", existingObj.toString()).commit()
+
+                // Trigger immediate re-render
+                scope.launch {
+                    val index  = SlotRegistry.getSlotIndex(context, widgetId) ?: return@launch
+                    val widget = SlotRegistry.getWidget(index) ?: return@launch
+                    widget.updateAll(context)
+                }
+
+                "success"
+            } catch (e: Exception) {
+                throw Exception("E_WIDGET_ERROR [$widgetId]: ${e.message}")
+            }
         }
 
         AsyncFunction("removeWidgetSchema") { widgetId: String ->
@@ -99,6 +154,30 @@ class WidgetBridge : Module() {
                 "assignments"    to assigned
             )
         }
+
+        AsyncFunction("seedSharedAsset") { localPath: String, filename: String, force: Boolean ->
+            val context = appContext.reactContext ?: throw Exception("React context not available")
+
+            try {
+                val dest = java.io.File(context.filesDir, filename)
+
+                if (dest.exists() && !force) return@AsyncFunction "exists"
+                if (dest.exists()) dest.delete()
+
+                val src = java.io.File(localPath)
+                src.inputStream().use { input ->
+                    dest.outputStream().use { output -> input.copyTo(output) }
+                }
+
+                "copied"
+            } catch (e: Exception) {
+                throw Exception("E_SEED_ASSET [$filename]: ${e.message}")
+            }
+        }
+
+        OnDestroy {
+            scope.cancel()
+        }
     }
 
     private fun updateWidgetPreview(
@@ -115,7 +194,6 @@ class WidgetBridge : Module() {
             val children = small.optJSONArray("children") ?: return
             val bgColor  = parseColor(small.optString("backgroundColor", "#1C1C1E"))
 
-            // Build a RemoteViews preview from the JSON text nodes
             val views = RemoteViews(context.packageName, R.layout.widget_preview_root)
             views.setInt(R.id.preview_root, "setBackgroundColor", bgColor)
 

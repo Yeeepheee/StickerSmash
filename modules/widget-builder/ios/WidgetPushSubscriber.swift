@@ -3,22 +3,32 @@ import WidgetKit
 import Foundation
 
 public class WidgetPushSubscriber: ExpoAppDelegateSubscriber {
-    public func application(
-        _ application: UIApplication,
-        didReceiveRemoteNotification userInfo: [AnyHashable : Any],
-        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
-    ) {
-        NSLog("🚨 WIDGET PUSH SUBSCRIBER HIT!")
+  public func application(
+      _ application: UIApplication,
+      didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+  ) {
+      var action: String? = nil
+      var payloadData: [AnyHashable: Any] = userInfo
 
-        guard let action = userInfo["action"] as? String, action == "UPDATE_WIDGET" else {
-            NSLog("❌ Action did not match or was missing.")
-            completionHandler(.noData)
-            return
-        }
+      if let body = userInfo["body"] as? [AnyHashable: Any] {
+          action = body["action"] as? String
+          payloadData = body
+      } else if let data = userInfo["data"] as? [AnyHashable: Any] {
+          action = data["action"] as? String
+          payloadData = data
+      }
 
-        NSLog("✅ Action matched, triggering widget reload...")
-        WidgetCenter.shared.reloadAllTimelines()
-        NSLog("📡 reloadAllTimelines() called")
-        completionHandler(.newData)
-    }
+      if action == nil {
+          action = userInfo["action"] as? String
+      }
+
+      guard action == "UPDATE_WIDGET" else {
+          completionHandler(.noData)
+          return
+      }
+
+      WidgetBridge.handlePushNotification(payloadData)
+      completionHandler(.newData)
+  }
 }

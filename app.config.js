@@ -16,12 +16,13 @@ export default {
         NSSupportsLiveActivities: true,
         NSSupportsLiveActivitiesFrequentUpdates: true,
         UIBackgroundModes: ["remote-notification", "fetch"],
-        NSAppTransportSecurity: { NSAllowsArbitraryLoads: true }
+        NSAppTransportSecurity: { NSAllowsArbitraryLoads: true },
+        AppGroupIdentifier: process.env.APP_GROUP_ID
       },
-      bundleIdentifier: process.env.BUNDLE_ID ?? "com.luminous5972.StickerSmash",
+      bundleIdentifier: process.env.BUNDLE_ID,
       entitlements: {
         "com.apple.security.application-groups": [
-          `group.${process.env.BUNDLE_ID ?? "com.luminous5972.StickerSmash"}`
+          process.env.APP_GROUP_ID
         ]
       }
     },
@@ -30,8 +31,10 @@ export default {
       adaptiveIcon: { backgroundColor: "#E6F4FE" },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
-      package: process.env.BUNDLE_ID ?? "com.luminous5972.StickerSmash",
+      package: process.env.BUNDLE_ID,
       permissions: [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
@@ -59,12 +62,23 @@ export default {
         isAccessMediaLocationEnabled: true,
         granularPermissions: ["audio", "photo"]
       }],
+      ["expo-calendar",
+        {
+          calendarPermission: "Allow this app to read your calendar to display events on the widget."
+        }
+      ],
       "patch-project",
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      "expo-notifications"
     ],
     experiments: {
       typedRoutes: true,
       reactCompiler: true
+    },
+    extra: {
+      eas: {
+        projectId: process.env.EXPO_PUBLIC_PROJECT_ID
+      }
     }
   }
 };

@@ -74,8 +74,6 @@ dependencies {
   implementation "androidx.glance:glance-material3:1.1.0"
   implementation("io.coil-kt:coil:2.6.0") 
   implementation "androidx.work:work-runtime-ktx:2.9.0"
-  implementation "com.google.firebase:firebase-messaging:23.4.0"
-  
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$hostKotlinVersion"
 }

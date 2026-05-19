@@ -4,8 +4,9 @@ import { useEffect, useState, useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
-
+import * as Notifications from 'expo-notifications';
 import domtoimage from 'dom-to-image';
+
 import Button from '@/components/Button';
 import ImageViewer from '@/components/ImageViewer';
 import IconButton from '@/components/IconButton';
@@ -14,9 +15,19 @@ import EmojiPicker from '@/components/EmojiPicker';
 import EmojiList from '@/components/EmojiList';
 import EmojiSticker from '@/components/EmojiSticker';
 import Timer from '@/components/Timer';
-import * as Notifications from 'expo-notifications';
-import {WeatherWidget} from '@/components/WeatherWidget';
-import {NewsWidget} from '@/components/NewsWidget';
+import { WeatherWidget } from '@/components/widgets/WeatherWidget';
+import { NewsWidget } from '@/components/widgets/NewsWidget';
+import { registerBackgroundNotificationTask } from '@/components/BackgroundNotificationTask';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 const PlaceholderImage = require('@/assets/images/background-image.png');
 const RNShared = NativeModules.RNShared;
@@ -28,64 +39,50 @@ export default function Index() {
   const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType | undefined>(undefined);
   const [permissionResponse, requestPermission] = MediaLibrary.usePermissions({ granularPermissions: ['photo'] });
   const imageRef = useRef<View>(null);
-  
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
-
-  useEffect(() => {
-    async function getToken() {
-      try {
-        const token = (await Notifications.getDevicePushTokenAsync()).data;
-        console.log("FCM Token:", token);
-      } catch (error) {
-        console.log("Error getting token:", error);
-      }
-    }
-
-    getToken();
-  }, []);
-
-  useEffect(() => {
-    NewsWidget();
-    WeatherWidget();
-  });
+  const [containerDimensions, setContainerDimensions] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
 
-    async function requestPermissions() {
+    async function setup() {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
         alert('Permission for notifications was denied');
+        return;
       }
+      const apnsToken = await Notifications.getDevicePushTokenAsync();
+      console.log("APNs Token:", apnsToken.data);
+      
+      await registerBackgroundNotificationTask();
     }
 
-    requestPermissions();
+    setup();
 
     const subscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification Received:', notification);
+      console.log('[PUSH] Received:', notification.request.content.data);
     });
 
     return () => subscription.remove();
   }, []);
 
-  const [containerDimensions, setContainerDimensions] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  useEffect(() => {
+    NewsWidget();
+    WeatherWidget();
+  }, []);
 
-  const onContainerLayout = (event: { nativeEvent: { layout: { x: any, y: any, width: any; height: any; }; }; }) => {
+  useEffect(() => {
+    if (!permissionResponse?.granted) {
+      requestPermission();
+    }
+  }, []);
+
+  const onContainerLayout = (event: { nativeEvent: { layout: { x: any, y: any, width: any; height: any } } }) => {
     const { x, y, width, height } = event.nativeEvent.layout;
-    console.log("height: " + height + ", width: " + width + ", x: " + x + ", y: " + y);
     setContainerDimensions({ x, y, width, height });
   };
 
   const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       quality: 1,
@@ -99,43 +96,19 @@ export default function Index() {
     }
   };
 
-  const onReset = () => {
-    setShowAppOptions(false);
-  };
-
-  const onAddSticker = () => {
-    setIsModalVisible(true);
-  };
-
-  const onModalClose = () => {
-    setIsModalVisible(false);
-  };
-
   const onSaveImageAsync = async () => {
     if (Platform.OS !== 'web') {
       try {
-        const localUri = await captureRef(imageRef, {
-          height: 440,
-          quality: 1,
-        });
-
+        const localUri = await captureRef(imageRef, { height: 440, quality: 1 });
         await MediaLibrary.saveToLibraryAsync(localUri);
-        if (localUri) {
-          alert('Saved!');
-        }
+        if (localUri) alert('Saved!');
       } catch (e) {
         console.log(e);
       }
-    }
-    else {
+    } else {
       try {
-        const dataUrl = await domtoimage.toJpeg(imageRef.current, {
-          quality: 0.95,
-          width: 320,
-          height: 440,
-        });
-
-        let link = document.createElement('a');
+        const dataUrl = await domtoimage.toJpeg(imageRef.current, { quality: 0.95, width: 320, height: 440 });
+        const link = document.createElement('a');
         link.download = 'sticker-smash.jpeg';
         link.href = dataUrl;
         link.click();
@@ -145,22 +118,14 @@ export default function Index() {
     }
   };
 
-  useEffect(() => {
-    if (!permissionResponse?.granted) {
-      requestPermission();
-    }
-  }, []);
-
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* <WidgetEditor/> */}
       <View style={styles.timerList}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timerScroll}>
-          <Timer title="Pizza" timerId="t1" initialSeconds={600} />
-          <Timer title="Gym" timerId="t2" initialSeconds={60} />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.timerScroll}>
+          <Timer title="Pizza"   timerId="t1" initialSeconds={600} />
+          <Timer title="Gym"     timerId="t2" initialSeconds={60} />
           <Timer title="Laundry" timerId="t3" initialSeconds={1800} />
-          <Timer title="Focus" timerId="t4" initialSeconds={1500} />
-          {/* You can add up to 10 or more here */}
+          <Timer title="Focus"   timerId="t4" initialSeconds={1500} />
         </ScrollView>
       </View>
       <View style={styles.container}>
@@ -173,9 +138,9 @@ export default function Index() {
         {showAppOptions ? (
           <View style={styles.optionsContainer}>
             <View style={styles.optionsRow}>
-              <IconButton icon="refresh" label="Reset" onPress={onReset} />
-              <CircleButton onPress={onAddSticker} />
-              <IconButton icon="save-alt" label="Save" onPress={onSaveImageAsync} />
+              <IconButton icon="refresh"  label="Reset"  onPress={() => setShowAppOptions(false)} />
+              <CircleButton onPress={() => setIsModalVisible(true)} />
+              <IconButton icon="save-alt" label="Save"   onPress={onSaveImageAsync} />
             </View>
           </View>
         ) : (
@@ -184,8 +149,8 @@ export default function Index() {
             <Button label="Use this photo" onPress={() => setShowAppOptions(true)} />
           </View>
         )}
-        <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
-          <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
+        <EmojiPicker isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+          <EmojiList onSelect={setPickedEmoji} onCloseModal={() => setIsModalVisible(false)} />
         </EmojiPicker>
       </View>
     </GestureHandlerRootView>
@@ -213,12 +178,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  EmojiSticker: {
-
-  },
   timerList: {
     paddingTop: 50,
     width: '100%',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
+  timerScroll: {},
 });

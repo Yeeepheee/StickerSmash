@@ -15,7 +15,6 @@ object SlotRegistry {
 
         map[widgetId]?.let { return it }
 
-        // Assign next available slot
         val used  = map.values.toSet()
         val index = (0 until MAX_SLOTS).firstOrNull { it !in used } ?: return null // full
 

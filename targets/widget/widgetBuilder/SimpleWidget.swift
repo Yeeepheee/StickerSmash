@@ -1,6 +1,9 @@
 import WidgetKit
 import SwiftUI
 
+
+private let appGroup: String = "group.com.luminous5972.StickerSmash"
+
 // MARK: - Timeline Entry
 
 struct SimpleWidgetEntry: TimelineEntry {
@@ -20,23 +23,37 @@ struct SlotWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleWidgetEntry) -> Void) {
-        let entry = SimpleWidgetEntry(date: Date(), config: loadConfig(), images: [:], remoteData: [:])
+        var remoteOverrides: [String: NodeOverride] = [:]
+        let cacheKey = "widget_remote_data_\(widgetId)"
+        if let cachedData = UserDefaults(suiteName: appGroup)?.data(forKey: cacheKey),
+        let decoded = try? JSONDecoder().decode([String: NodeOverride].self, from: cachedData) {
+            remoteOverrides = decoded
+        }
+        let entry = SimpleWidgetEntry(date: Date(), config: loadConfig(), images: [:], remoteData: remoteOverrides)
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleWidgetEntry>) -> Void) {
         NSLog("🔄 WIDGET [\(widgetId)]: getTimeline called by system")
         let config = loadConfig()
-        let sharedDefaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
+        let sharedDefaults = UserDefaults(suiteName: appGroup)
         var remoteOverrides: [String: NodeOverride] = [:]
 
         let dispatchGroup = DispatchGroup()
 
         let cacheKey = "widget_remote_data_\(widgetId)"
-        if let cachedData = sharedDefaults?.data(forKey: cacheKey),
-           let decoded = try? JSONDecoder().decode([String: NodeOverride].self, from: cachedData) {
-            remoteOverrides = decoded
-            NSLog("✅ WIDGET [\(widgetId)]: Loaded cached remote data")
+        if let cachedData = sharedDefaults?.data(forKey: cacheKey) {
+            NSLog("📦 WIDGET [\(widgetId)]: found \(cachedData.count) bytes at \(cacheKey)")
+            do {
+                remoteOverrides = try JSONDecoder().decode([String: NodeOverride].self, from: cachedData)
+                NSLog("✅ WIDGET [\(widgetId)]: decoded \(remoteOverrides.count) overrides")
+            } catch {
+                NSLog("❌ WIDGET [\(widgetId)]: decode failed: \(error)")
+                
+                NSLog("📄 Raw JSON: \(String(data: cachedData, encoding: .utf8) ?? "unreadable")")
+            }
+        } else {
+            NSLog("⚠️ WIDGET [\(widgetId)]: nothing stored at key \(cacheKey)")
         }
 
         if let urlString = config?.remoteConfigUrl, let url = URL(string: urlString) {
@@ -44,6 +61,7 @@ struct SlotWidgetProvider: TimelineProvider {
             dispatchGroup.enter()
             var request = URLRequest(url: url)
             request.cachePolicy = .reloadIgnoringLocalCacheData
+            request.timeoutInterval = 5.0
             URLSession.shared.dataTask(with: request) { data, _, error in
                 if let data = data {
                     sharedDefaults?.set(data, forKey: cacheKey)
@@ -69,7 +87,7 @@ struct SlotWidgetProvider: TimelineProvider {
             }
 
             let downloadGroup = DispatchGroup()
-            let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.luminous5972.StickerSmash")
+            let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)
 
             for urlString in imageUrls {
                 downloadGroup.enter()
@@ -118,7 +136,7 @@ struct SlotWidgetProvider: TimelineProvider {
     }
 
     private func loadConfig() -> MultiSizeWidgetConfig? {
-        let defaults = UserDefaults(suiteName: "group.com.luminous5972.StickerSmash")
+        let defaults = UserDefaults(suiteName: appGroup)
         let key = "widgetSchema_\(widgetId)"
         guard let json = defaults?.string(forKey: key),
               let data = json.data(using: .utf8) else {
@@ -143,7 +161,10 @@ struct SimpleWidgetEntryView: View {
     var body: some View {
         if let config = entry.config {
             let schemaToRender = currentSchema(for: family, from: config)
-            WidgetRenderer(schema: schemaToRender, images: entry.images, remoteData: entry.remoteData, isRoot: true)
+            
+            WidgetRenderer(schema: schemaToRender, 
+                           images: entry.images, 
+                           remoteData: entry.remoteData)
         } else {
             Text("No Content")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -38,7 +38,7 @@ export default function Timer({ title, timerId, initialSeconds = 60 }: TimerProp
 
   const cleanUp = async () => {
     await AsyncStorage.removeItem(`timer_end_${timerId}`);
-    LiveTimer.stopLiveActivity(timerId); //<-----------------
+    LiveTimer.stopLiveActivity(timerId);
     endTimeRef.current = null;
     setIsActive(false);
   };
@@ -51,7 +51,7 @@ export default function Timer({ title, timerId, initialSeconds = 60 }: TimerProp
         const endTimestamp = Date.now() + (seconds * 1000);
         endTimeRef.current = endTimestamp;
         AsyncStorage.setItem(`timer_end_${timerId}`, endTimestamp.toString());
-        LiveTimer.startLiveActivity(endTimestamp, title, timerId); //<-----------------
+        LiveTimer.startLiveActivity(endTimestamp, title, timerId);
       }
 
       interval = setInterval(() => {
